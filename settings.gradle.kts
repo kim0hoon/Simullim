@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Simullim"
 include(":Main")
+include(":Common")
