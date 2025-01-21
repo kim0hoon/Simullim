@@ -1,4 +1,4 @@
-package com.simullim.common
+package com.simullim.compose
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -21,14 +21,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.simullim.R
 import com.simullim.compose.ui.theme.DarkGrey
 import com.simullim.compose.ui.theme.ParkGreen
 import com.simullim.compose.ui.theme.SimullimTheme
@@ -99,8 +97,8 @@ fun TwoButtonDialog(
     content: String,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
-    dismissText: String = stringResource(R.string.cancel),
-    confirmText: String = stringResource(R.string.confirm)
+    dismissText: String,
+    confirmText: String
 ) {
     Dialog(
         onDismissRequest = onDismiss,
