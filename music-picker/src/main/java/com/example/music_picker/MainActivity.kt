@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
@@ -33,7 +34,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     private fun Contents() {
         val viewModel = viewModel<MainViewModel>()
-        val playItems = viewModel.playItemsStateFlow.collectAsState()
+        val playItems = viewModel.playItemsStateFlow.collectAsState().value
         RoundedParkGreenBox(modifier = Modifier.fillMaxSize()) {
             Column {
                 CommonHeader(
@@ -47,7 +48,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
                 PlayList(
-                    playItems = playItems.value,
+                    playItems = playItems,
                     onCheckedChanged = viewModel::setCheckedItem,
                     modifier = Modifier.weight(1f)
                 )
@@ -55,7 +56,14 @@ class MainActivity : ComponentActivity() {
                     color = Color.White,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
-
+                //TODO onclick, 시간
+                PlaylistSelectButton(
+                    count = playItems.count { it.isChecked },
+                    onClick = {},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                )
             }
         }
     }

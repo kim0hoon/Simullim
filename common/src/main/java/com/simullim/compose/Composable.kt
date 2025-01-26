@@ -37,6 +37,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.common.R
 import com.simullim.compose.ui.theme.DarkGrey
+import com.simullim.compose.ui.theme.Grey81
 import com.simullim.compose.ui.theme.ParkGreen
 import com.simullim.compose.ui.theme.SimullimTheme
 import com.simullim.compose.ui.theme.Typography
@@ -46,18 +47,21 @@ fun RoundedParkGreenButton(
     onClick: () -> Unit,
     buttonText: String,
     modifier: Modifier = Modifier,
+    isEnabled: Boolean = true,
     innerPaddingHorizontal: Dp = 0.dp,
     innerPaddingVertical: Dp = 0.dp
 ) {
+    val color = if (isEnabled) ParkGreen else Grey81
     OutlinedButton(
         onClick = onClick, modifier = modifier,
         shape = RoundedCornerShape(10.dp),
-        border = BorderStroke(2.dp, ParkGreen)
+        enabled = isEnabled,
+        border = BorderStroke(2.dp, color),
     ) {
         Text(
             text = buttonText,
             textAlign = TextAlign.Center,
-            color = ParkGreen,
+            color = color,
             modifier = Modifier.padding(
                 horizontal = innerPaddingHorizontal,
                 vertical = innerPaddingVertical
@@ -69,7 +73,10 @@ fun RoundedParkGreenButton(
 @Composable
 @Preview(showBackground = true)
 private fun RoundedParkGreenButtonPreview() {
-    RoundedParkGreenButton({}, buttonText = "test")
+    Column(Modifier.background(Color.DarkGray)) {
+        RoundedParkGreenButton({}, buttonText = "test")
+        RoundedParkGreenButton({}, buttonText = "test", isEnabled = false)
+    }
 }
 
 @Composable
@@ -186,7 +193,7 @@ fun CommonHeader(
     ) {
         Box(
             modifier = Modifier
-                .padding(start = 8.dp)
+                .padding(start = 16.dp)
                 .size(24.dp)
         ) {
             leftIcon?.let {
@@ -214,7 +221,7 @@ fun CommonHeader(
 
         Box(
             modifier = Modifier
-                .padding(end = 8.dp)
+                .padding(end = 16.dp)
                 .size(24.dp)
         ) {
             rightIcon?.let {

@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">music-picker</string>
     <string name="playlist">Playlist</string>
+    <string name="playlist_select">%d 선택</string>
 </resources>

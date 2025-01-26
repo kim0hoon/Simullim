@@ -13,11 +13,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.music_picker.model.PlayItem
 import com.simullim.compose.RoundedParkGreenBox
+import com.simullim.compose.RoundedParkGreenButton
 import com.simullim.compose.ui.theme.ParkGreen
 import com.simullim.compose.ui.theme.Typography
 
@@ -107,6 +109,16 @@ internal fun ParkGreenWhiteCheckBox(
 }
 
 @Composable
-internal fun PlaylistSelectButtons() {
+internal fun PlaylistSelectButton(count: Int, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    RoundedParkGreenButton(
+        onClick = onClick,
+        buttonText = stringResource(R.string.playlist_select, count),
+        modifier = modifier
+    )
+}
 
+@Composable
+@Preview(showBackground = true)
+private fun PlaylistSelectButtonPreview() {
+    PlaylistSelectButton(0, {})
 }
