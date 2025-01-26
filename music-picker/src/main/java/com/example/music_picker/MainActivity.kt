@@ -41,7 +41,11 @@ class MainActivity : ComponentActivity() {
                     title = stringResource(R.string.playlist),
                     leftIcon = CommonHeaderIcon(
                         drawableRes = com.example.common.R.drawable.baseline_arrow_back_ios_new_24,
-                        onClick = { finish() })
+                        onClick = { finish() }),
+                    rightIcon = CommonHeaderIcon(
+                        drawableRes = com.example.common.R.drawable.ic_add_24,
+                        onClick = {}
+                    )
                 )
                 HorizontalDivider(
                     color = Color.White,
