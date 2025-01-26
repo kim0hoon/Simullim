@@ -113,7 +113,8 @@ internal fun PlaylistSelectButton(count: Int, onClick: () -> Unit, modifier: Mod
     RoundedParkGreenButton(
         onClick = onClick,
         buttonText = stringResource(R.string.playlist_select, count),
-        modifier = modifier
+        modifier = modifier,
+        isEnabled = count > 0
     )
 }
 
