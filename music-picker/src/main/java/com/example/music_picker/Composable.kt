@@ -1,9 +1,13 @@
 package com.example.music_picker
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Checkbox
@@ -14,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,15 +35,38 @@ internal fun PlayList(
     onCheckedChanged: (String, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(modifier = modifier) {
-        itemsIndexed(playItems) { idx, playItem ->
-            PlayListItem(
-                model = playItem,
-                onCheckedChanged = { onCheckedChanged(playItem.key, it) },
-                modifier = Modifier.fillMaxWidth()
+    if (playItems.isEmpty()) {
+        Box(modifier = modifier) {
+            Text(
+                text = stringResource(R.string.playlist_empty),
+                style = Typography.bodyMedium,
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.align(Alignment.Center)
             )
         }
+    } else {
+        LazyColumn(modifier = modifier) {
+            itemsIndexed(playItems) { idx, playItem ->
+                PlayListItem(
+                    model = playItem,
+                    onCheckedChanged = { onCheckedChanged(playItem.key, it) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
     }
+}
+
+@Composable
+@Preview(showBackground = true)
+private fun PlayListEmptyPreview() {
+    PlayList(
+        emptyList(), { _, _ -> }, modifier = Modifier
+            .background(Color.DarkGray)
+            .width(400.dp)
+            .height(700.dp)
+    )
 }
 
 @Composable
@@ -67,7 +95,6 @@ internal fun PlayListItem(
             })
         }
     }
-
 }
 
 @Composable
@@ -90,7 +117,6 @@ private fun PlayListItemPreview() {
                 true
             ), { _ -> })
     }
-
 }
 
 @Composable

@@ -104,6 +104,7 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
                             .weight(1f)
+                            .fillMaxWidth()
                     )
                     HorizontalDivider(
                         color = Color.White,
