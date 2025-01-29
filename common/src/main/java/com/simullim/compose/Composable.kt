@@ -93,7 +93,6 @@ fun RoundedParkGreenBox(
                 color = ParkGreen,
                 shape = RoundedCornerShape(radius)
             )
-            .background(color = DarkGrey)
     ) {
         boxScope()
     }

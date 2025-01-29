@@ -6,6 +6,8 @@ import android.provider.MediaStore
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,6 +25,7 @@ import com.example.music_picker.model.PlayItem
 import com.simullim.compose.CommonHeader
 import com.simullim.compose.CommonHeaderIcon
 import com.simullim.compose.RoundedParkGreenBox
+import com.simullim.compose.ui.theme.DarkGrey
 import com.simullim.compose.ui.theme.SimullimTheme
 import java.util.concurrent.TimeUnit
 
@@ -74,43 +77,50 @@ class MainActivity : ComponentActivity() {
     private fun Contents() {
         val viewModel = viewModel<MainViewModel>()
         val playItems = viewModel.playItemsStateFlow.collectAsState().value
-        RoundedParkGreenBox(modifier = Modifier.fillMaxSize()) {
-            Column {
-                CommonHeader(
-                    title = stringResource(R.string.playlist),
-                    leftIcon = CommonHeaderIcon(
-                        drawableRes = com.example.common.R.drawable.baseline_arrow_back_ios_new_24,
-                        onClick = { finish() }),
-                    rightIcon = CommonHeaderIcon(
-                        drawableRes = com.example.common.R.drawable.ic_add_24,
-                        onClick = { musicPickerObserver?.selectAudio() }
+        Box(modifier = Modifier.background(DarkGrey)) {
+            RoundedParkGreenBox(
+                modifier = Modifier
+                    .padding(4.dp)
+                    .fillMaxSize()
+            ) {
+                Column {
+                    CommonHeader(
+                        title = stringResource(R.string.playlist),
+                        leftIcon = CommonHeaderIcon(
+                            drawableRes = com.example.common.R.drawable.baseline_arrow_back_ios_new_24,
+                            onClick = { finish() }),
+                        rightIcon = CommonHeaderIcon(
+                            drawableRes = com.example.common.R.drawable.ic_add_24,
+                            onClick = { musicPickerObserver?.selectAudio() }
+                        )
                     )
-                )
-                HorizontalDivider(
-                    color = Color.White,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-                PlayList(
-                    playItems = playItems,
-                    onCheckedChanged = viewModel::setCheckedItem,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .weight(1f)
-                )
-                HorizontalDivider(
-                    color = Color.White,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-                //TODO onclick, 시간
-                PlaylistSelectButton(
-                    count = playItems.count { it.isChecked },
-                    onClick = {},
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp)
-                )
+                    HorizontalDivider(
+                        color = Color.White,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                    PlayList(
+                        playItems = playItems,
+                        onCheckedChanged = viewModel::setCheckedItem,
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .weight(1f)
+                    )
+                    HorizontalDivider(
+                        color = Color.White,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                    //TODO onclick, 시간
+                    PlaylistSelectButton(
+                        count = playItems.count { it.isChecked },
+                        onClick = {},
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                    )
+                }
             }
         }
+
     }
 
     @Composable
