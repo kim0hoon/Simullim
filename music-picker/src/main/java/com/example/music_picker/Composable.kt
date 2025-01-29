@@ -144,7 +144,8 @@ internal fun PlaylistSelectButton(count: Int, onClick: () -> Unit, modifier: Mod
         onClick = onClick,
         buttonText = stringResource(R.string.playlist_select, count),
         modifier = modifier,
-        isEnabled = count > 0
+        isEnabled = count > 0,
+        innerPaddingVertical = 4.dp
     )
 }
 
