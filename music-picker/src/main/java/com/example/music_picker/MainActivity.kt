@@ -1,8 +1,11 @@
 package com.example.music_picker
 
+import android.media.MediaMetadataRetriever
 import android.os.Bundle
+import android.provider.MediaStore
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,12 +19,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.music_picker.model.PlayItem
 import com.simullim.compose.CommonHeader
 import com.simullim.compose.CommonHeaderIcon
 import com.simullim.compose.RoundedParkGreenBox
 import com.simullim.compose.ui.theme.SimullimTheme
+import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
+    private var musicPickerObserver: MusicPickerObserver? = null
+    private val mainViewModel by viewModels<MainViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -29,6 +36,36 @@ class MainActivity : ComponentActivity() {
                 Contents()
             }
         }
+        musicPickerObserver =
+            MusicPickerObserver(activityResultRegistry, MUSIC_PICKER_OBSERVER_KEY) { uris ->
+                val metadataRetriever = MediaMetadataRetriever()
+                val projection = arrayOf(MediaStore.Audio.Media.DISPLAY_NAME)
+                val unknownString = getString(R.string.unknown)
+                val playItems = uris.map { uri ->
+                    metadataRetriever.setDataSource(this, uri)
+                    val duration =
+                        metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                            ?.let {
+                                val longDuration = it.toLong()
+                                val min = TimeUnit.MILLISECONDS.toMinutes(longDuration)
+                                val sec = TimeUnit.MILLISECONDS.toSeconds(longDuration) % 60
+                                String.format(null, "%02d:%02d", min, sec)
+                            } ?: unknownString
+                    val title = contentResolver.query(uri, projection, null, null, null)
+                        ?.apply { moveToFirst() }?.let {
+                            val displayNameIndex =
+                                it.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
+                            val displayName = it.getString(displayNameIndex)
+                            it.close()
+                            displayName
+                        } ?: unknownString
+                    PlayItem(uri = uri, title = title, durationString = duration)
+                }
+                metadataRetriever.release()
+                mainViewModel.addPlayItems(playItems)
+            }.also {
+                lifecycle.addObserver(it)
+            }
     }
 
     @Composable
@@ -44,7 +81,7 @@ class MainActivity : ComponentActivity() {
                         onClick = { finish() }),
                     rightIcon = CommonHeaderIcon(
                         drawableRes = com.example.common.R.drawable.ic_add_24,
-                        onClick = {}
+                        onClick = { musicPickerObserver?.selectAudio() }
                     )
                 )
                 HorizontalDivider(
@@ -54,7 +91,9 @@ class MainActivity : ComponentActivity() {
                 PlayList(
                     playItems = playItems,
                     onCheckedChanged = viewModel::setCheckedItem,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .weight(1f)
                 )
                 HorizontalDivider(
                     color = Color.White,
@@ -76,5 +115,9 @@ class MainActivity : ComponentActivity() {
     @Preview(showBackground = true)
     private fun ContentsPreview() {
         Contents()
+    }
+
+    companion object {
+        private const val MUSIC_PICKER_OBSERVER_KEY = "music_picker_observer_key"
     }
 }

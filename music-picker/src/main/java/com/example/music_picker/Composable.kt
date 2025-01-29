@@ -1,5 +1,6 @@
 package com.example.music_picker
 
+import android.net.Uri
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -76,13 +77,17 @@ private fun PlayListItemPreview() {
     Column {
         PlayListItem(
             model = PlayItem(
+                Uri.parse(""),
                 "title test 123123123123123123123123123123123123123123123123123",
+                "12:12",
                 false
             ), { _ -> })
 
         PlayListItem(
             model = PlayItem(
+                Uri.parse(""),
                 "title test",
+                "02:12",
                 true
             ), { _ -> })
     }
