@@ -1,6 +1,5 @@
 package com.example.music_picker
 
-import android.net.Uri
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,14 +27,14 @@ import com.simullim.compose.ui.theme.Typography
 @Composable
 internal fun PlayList(
     playItems: List<PlayItem>,
-    onCheckedChanged: (Int, Boolean) -> Unit,
+    onCheckedChanged: (String, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier) {
         itemsIndexed(playItems) { idx, playItem ->
             PlayListItem(
                 model = playItem,
-                onCheckedChanged = { onCheckedChanged(idx, it) },
+                onCheckedChanged = { onCheckedChanged(playItem.key, it) },
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -77,7 +76,7 @@ private fun PlayListItemPreview() {
     Column {
         PlayListItem(
             model = PlayItem(
-                Uri.parse(""),
+                "",
                 "title test 123123123123123123123123123123123123123123123123123",
                 "12:12",
                 false
@@ -85,7 +84,7 @@ private fun PlayListItemPreview() {
 
         PlayListItem(
             model = PlayItem(
-                Uri.parse(""),
+                "",
                 "title test",
                 "02:12",
                 true

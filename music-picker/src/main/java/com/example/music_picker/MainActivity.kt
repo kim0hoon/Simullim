@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
                 val metadataRetriever = MediaMetadataRetriever()
                 val projection = arrayOf(MediaStore.Audio.Media.DISPLAY_NAME)
                 val unknownString = getString(R.string.unknown)
-                val playItems = uris.map { uri ->
+                val playItems = uris.mapNotNull { uri ->
                     metadataRetriever.setDataSource(this, uri)
                     val duration =
                         metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
@@ -59,7 +59,9 @@ class MainActivity : ComponentActivity() {
                             it.close()
                             displayName
                         } ?: unknownString
-                    PlayItem(uri = uri, title = title, durationString = duration)
+                    uri.path?.let { path ->
+                        PlayItem(uriString = path, title = title, durationString = duration)
+                    }
                 }
                 metadataRetriever.release()
                 mainViewModel.addPlayItems(playItems)
