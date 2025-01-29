@@ -3,6 +3,7 @@ package com.example.music_picker
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -46,12 +47,17 @@ internal fun PlayList(
             )
         }
     } else {
-        LazyColumn(modifier = modifier) {
+        LazyColumn(
+            modifier = modifier,
+            contentPadding = PaddingValues(vertical = 4.dp)
+        ) {
             itemsIndexed(playItems) { idx, playItem ->
                 PlayListItem(
                     model = playItem,
                     onCheckedChanged = { onCheckedChanged(playItem.key, it) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = (if (idx == 0) 0 else 4).dp)
                 )
             }
         }
@@ -63,6 +69,17 @@ internal fun PlayList(
 private fun PlayListEmptyPreview() {
     PlayList(
         emptyList(), { _, _ -> }, modifier = Modifier
+            .background(Color.DarkGray)
+            .width(400.dp)
+            .height(700.dp)
+    )
+}
+
+@Composable
+@Preview(showBackground = true)
+private fun PlayListPreview() {
+    PlayList(
+        List(20) { PlayItem("", "title $it", "00:00") }, { _, _ -> }, modifier = Modifier
             .background(Color.DarkGray)
             .width(400.dp)
             .height(700.dp)
