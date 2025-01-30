@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">music-picker</string>
     <string name="playlist">Playlist</string>
-    <string name="playlist_select">%d 선택</string>
+    <string name="playlist_select">%d 선택 (%s)</string>
     <string name="unknown">알 수 없음</string>
     <string name="playlist_empty">플레이리스트가 비어있습니다\n\'+\' 버튼으로 음악을 추가해보세요!</string>
     <string name="check_all">전체선택</string>

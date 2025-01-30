@@ -32,8 +32,10 @@ import androidx.compose.ui.unit.dp
 import com.example.music_picker.model.PlayItem
 import com.simullim.compose.RoundedParkGreenBox
 import com.simullim.compose.RoundedParkGreenButton
+import com.simullim.compose.ui.theme.GreyD4
 import com.simullim.compose.ui.theme.ParkGreen
 import com.simullim.compose.ui.theme.Typography
+import com.simullim.millsToMinSecString
 
 
 @Composable
@@ -92,7 +94,7 @@ private fun PlayListEmptyPreview() {
 @Preview(showBackground = true)
 private fun PlayListPreview() {
     PlayList(
-        List(20) { PlayItem("", "title $it", "00:00") }, { _, _ -> }, {}, {}, modifier = Modifier
+        List(20) { PlayItem("", "title $it", 0) }, { _, _ -> }, {}, {}, modifier = Modifier
             .background(Color.DarkGray)
             .width(400.dp)
             .height(700.dp)
@@ -110,16 +112,30 @@ internal fun PlayListItem(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
-            Text(
-                text = model.title,
-                style = Typography.bodyMedium,
-                color = Color.White,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+            Column(
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 4.dp)
-            )
+            ) {
+                Text(
+                    text = model.title,
+                    style = Typography.bodyMedium,
+                    color = Color.White,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = model.durationMillis?.let {
+                        millsToMinSecString(it)
+                    } ?: stringResource(R.string.unknown),
+                    style = Typography.bodySmall,
+                    color = GreyD4,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = 2.dp)
+                )
+            }
+
             ParkGreenWhiteCheckBox(isChecked = model.isChecked, onCheckedChanged = {
                 onCheckedChanged(it)
             })
@@ -135,7 +151,7 @@ private fun PlayListItemPreview() {
             model = PlayItem(
                 "",
                 "title test 123123123123123123123123123123123123123123123123123",
-                "12:12",
+                123,
                 false
             ), { _ -> })
 
@@ -143,7 +159,7 @@ private fun PlayListItemPreview() {
             model = PlayItem(
                 "",
                 "title test",
-                "02:12",
+                1231,
                 true
             ), { _ -> })
     }
@@ -171,12 +187,17 @@ internal fun ParkGreenWhiteCheckBox(
 }
 
 @Composable
-internal fun PlaylistSelectButton(count: Int, onClick: () -> Unit, modifier: Modifier = Modifier) {
+internal fun PlaylistSelectButton(
+    text: String,
+    isEnabled: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     RoundedParkGreenButton(
         onClick = onClick,
-        buttonText = stringResource(R.string.playlist_select, count),
+        buttonText = text,
         modifier = modifier,
-        isEnabled = count > 0,
+        isEnabled = isEnabled,
         innerPaddingVertical = 4.dp
     )
 }
@@ -184,7 +205,7 @@ internal fun PlaylistSelectButton(count: Int, onClick: () -> Unit, modifier: Mod
 @Composable
 @Preview(showBackground = true)
 private fun PlaylistSelectButtonPreview() {
-    PlaylistSelectButton(0, {})
+    PlaylistSelectButton("선택", true, {})
 }
 
 @Composable

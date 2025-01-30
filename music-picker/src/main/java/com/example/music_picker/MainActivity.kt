@@ -27,7 +27,7 @@ import com.simullim.compose.CommonHeaderIcon
 import com.simullim.compose.RoundedParkGreenBox
 import com.simullim.compose.ui.theme.DarkGrey
 import com.simullim.compose.ui.theme.SimullimTheme
-import java.util.concurrent.TimeUnit
+import com.simullim.millsToHourMinSecString
 
 class MainActivity : ComponentActivity() {
     private var musicPickerObserver: MusicPickerObserver? = null
@@ -48,12 +48,6 @@ class MainActivity : ComponentActivity() {
                     metadataRetriever.setDataSource(this, uri)
                     val duration =
                         metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                            ?.let {
-                                val longDuration = it.toLong()
-                                val min = TimeUnit.MILLISECONDS.toMinutes(longDuration)
-                                val sec = TimeUnit.MILLISECONDS.toSeconds(longDuration) % 60
-                                String.format(null, "%02d:%02d", min, sec)
-                            } ?: unknownString
                     val title = contentResolver.query(uri, projection, null, null, null)
                         ?.apply { moveToFirst() }?.let {
                             val displayNameIndex =
@@ -63,7 +57,11 @@ class MainActivity : ComponentActivity() {
                             displayName
                         } ?: unknownString
                     uri.path?.let { path ->
-                        PlayItem(uriString = path, title = title, durationString = duration)
+                        PlayItem(
+                            uriString = path,
+                            title = title,
+                            durationMillis = duration?.toLong()
+                        )
                     }
                 }
                 metadataRetriever.release()
@@ -112,9 +110,15 @@ class MainActivity : ComponentActivity() {
                         color = Color.White,
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
-                    //TODO onclick, 시간
+                    //TODO onclick
+                    val selected = playItems.filter { it.isChecked }
+                    val sumOfDurations = selected.sumOf { it.durationMillis ?: 0L }
+                    val durationString = millsToHourMinSecString(sumOfDurations)
+                    val text =
+                        stringResource(R.string.playlist_select, selected.size, durationString)
                     PlaylistSelectButton(
-                        count = playItems.count { it.isChecked },
+                        text = text,
+                        isEnabled = selected.isNotEmpty(),
                         onClick = {},
                         modifier = Modifier
                             .fillMaxWidth()
