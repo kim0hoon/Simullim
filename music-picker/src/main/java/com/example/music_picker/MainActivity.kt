@@ -1,5 +1,6 @@
 package com.example.music_picker
 
+import android.content.Intent
 import android.media.MediaMetadataRetriever
 import android.os.Bundle
 import android.provider.MediaStore
@@ -110,7 +111,6 @@ class MainActivity : ComponentActivity() {
                         color = Color.White,
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
-                    //TODO onclick
                     val selected = playItems.filter { it.isChecked }
                     val sumOfDurations = selected.sumOf { it.durationMillis ?: 0L }
                     val durationString = millsToHourMinSecString(sumOfDurations)
@@ -119,7 +119,16 @@ class MainActivity : ComponentActivity() {
                     PlaylistSelectButton(
                         text = text,
                         isEnabled = selected.isNotEmpty(),
-                        onClick = {},
+                        onClick = {
+                            val result = Intent().apply {
+                                putParcelableArrayListExtra(
+                                    PLAYLIST_RESULT_KEY,
+                                    ArrayList(selected)
+                                )
+                            }
+                            setResult(RESULT_OK, result)
+                            finish()
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 4.dp)
@@ -127,7 +136,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-
     }
 
     @Composable
