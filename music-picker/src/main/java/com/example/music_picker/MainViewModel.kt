@@ -14,7 +14,7 @@ internal class MainViewModel : ViewModel() {
         MutableStateFlow<LinkedHashMap<String, PlayItem>>(LinkedHashMap())
     val playItemsStateFlow = _playItemsStateFlow.map { it.values.toList() }.stateIn(
         viewModelScope,
-        SharingStarted.Eagerly, emptyList()
+        SharingStarted.WhileSubscribed(), emptyList()
     )
 
     fun setPlayItems(items: List<PlayItem>) {
@@ -58,5 +58,17 @@ internal class MainViewModel : ViewModel() {
                 replace(key, prev.copy(isChecked = isChecked))
             }
         }
+    }
+
+    fun checkAllItems(isChecked: Boolean) {
+        _playItemsStateFlow.update {
+            LinkedHashMap(it).apply {
+                replaceAll { _, u -> u.copy(isChecked = isChecked) }
+            }
+        }
+    }
+
+    fun removeCheckedItems() {
+        removePlayItems(items = playItemsStateFlow.value.filter { it.isChecked })
     }
 }

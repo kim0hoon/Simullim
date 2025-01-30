@@ -101,6 +101,8 @@ class MainActivity : ComponentActivity() {
                     PlayList(
                         playItems = playItems,
                         onCheckedChanged = viewModel::setCheckedItem,
+                        onClickAllCheck = viewModel::checkAllItems,
+                        onClickRemove = viewModel::removeCheckedItems,
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
                             .weight(1f)

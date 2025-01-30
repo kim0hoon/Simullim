@@ -1,6 +1,8 @@
 package com.example.music_picker
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,11 +15,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -34,6 +40,8 @@ import com.simullim.compose.ui.theme.Typography
 internal fun PlayList(
     playItems: List<PlayItem>,
     onCheckedChanged: (String, Boolean) -> Unit,
+    onClickAllCheck: (Boolean) -> Unit,
+    onClickRemove: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (playItems.isEmpty()) {
@@ -47,18 +55,28 @@ internal fun PlayList(
             )
         }
     } else {
-        LazyColumn(
-            modifier = modifier,
-            contentPadding = PaddingValues(vertical = 4.dp)
-        ) {
-            itemsIndexed(playItems) { idx, playItem ->
-                PlayListItem(
-                    model = playItem,
-                    onCheckedChanged = { onCheckedChanged(playItem.key, it) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = (if (idx == 0) 0 else 4).dp)
-                )
+        Column {
+            PlayListOptions(
+                isChecked = playItems.any { it.isChecked.not() }.not(),
+                onClickAllCheck = onClickAllCheck,
+                onClickRemove = onClickRemove,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth()
+            )
+            LazyColumn(
+                modifier = modifier,
+                contentPadding = PaddingValues(vertical = 4.dp)
+            ) {
+                itemsIndexed(playItems) { idx, playItem ->
+                    PlayListItem(
+                        model = playItem,
+                        onCheckedChanged = { onCheckedChanged(playItem.key, it) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = (if (idx == 0) 0 else 4).dp)
+                    )
+                }
             }
         }
     }
@@ -68,7 +86,7 @@ internal fun PlayList(
 @Preview(showBackground = true)
 private fun PlayListEmptyPreview() {
     PlayList(
-        emptyList(), { _, _ -> }, modifier = Modifier
+        emptyList(), { _, _ -> }, {}, {}, modifier = Modifier
             .background(Color.DarkGray)
             .width(400.dp)
             .height(700.dp)
@@ -79,7 +97,7 @@ private fun PlayListEmptyPreview() {
 @Preview(showBackground = true)
 private fun PlayListPreview() {
     PlayList(
-        List(20) { PlayItem("", "title $it", "00:00") }, { _, _ -> }, modifier = Modifier
+        List(20) { PlayItem("", "title $it", "00:00") }, { _, _ -> }, {}, {}, modifier = Modifier
             .background(Color.DarkGray)
             .width(400.dp)
             .height(700.dp)
@@ -142,17 +160,19 @@ internal fun ParkGreenWhiteCheckBox(
     onCheckedChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Checkbox(
-        checked = isChecked, onCheckedChange = {
-            onCheckedChanged(it)
-        }, modifier = modifier, colors = CheckboxDefaults.colors().copy(
-            checkedCheckmarkColor = ParkGreen,
-            uncheckedBoxColor = Color.Transparent,
-            checkedBoxColor = Color.Transparent,
-            checkedBorderColor = Color.White,
-            uncheckedBorderColor = Color.White
+    CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
+        Checkbox(
+            checked = isChecked, onCheckedChange = {
+                onCheckedChanged(it)
+            }, modifier = modifier, colors = CheckboxDefaults.colors().copy(
+                checkedCheckmarkColor = ParkGreen,
+                uncheckedBoxColor = Color.Transparent,
+                checkedBoxColor = Color.Transparent,
+                checkedBorderColor = Color.White,
+                uncheckedBorderColor = Color.White
+            )
         )
-    )
+    }
 }
 
 @Composable
@@ -170,4 +190,35 @@ internal fun PlaylistSelectButton(count: Int, onClick: () -> Unit, modifier: Mod
 @Preview(showBackground = true)
 private fun PlaylistSelectButtonPreview() {
     PlaylistSelectButton(0, {})
+}
+
+@Composable
+internal fun PlayListOptions(
+    isChecked: Boolean,
+    onClickAllCheck: (Boolean) -> Unit,
+    onClickRemove: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(modifier = modifier.padding(vertical = 12.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            ParkGreenWhiteCheckBox(
+                isChecked = isChecked,
+                onCheckedChanged = onClickAllCheck,
+            )
+            Text(
+                text = stringResource(R.string.check_all),
+                color = Color.White,
+                style = Typography.bodyLarge,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+        }
+        Image(
+            painter = painterResource(com.example.common.R.drawable.baseline_delete_24),
+            colorFilter = ColorFilter.tint(Color.White),
+            contentDescription = null,
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .clickable { onClickRemove() }
+        )
+    }
 }
