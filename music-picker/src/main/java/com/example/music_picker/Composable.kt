@@ -55,19 +55,14 @@ internal fun PlayList(
             )
         }
     } else {
-        Column {
+        Column(modifier = modifier) {
             PlayListOptions(
                 isChecked = playItems.any { it.isChecked.not() }.not(),
                 onClickAllCheck = onClickAllCheck,
                 onClickRemove = onClickRemove,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             )
-            LazyColumn(
-                modifier = modifier,
-                contentPadding = PaddingValues(vertical = 4.dp)
-            ) {
+            LazyColumn(contentPadding = PaddingValues(vertical = 4.dp)) {
                 itemsIndexed(playItems) { idx, playItem ->
                     PlayListItem(
                         model = playItem,
@@ -203,7 +198,7 @@ internal fun PlayListOptions(
         Row(verticalAlignment = Alignment.CenterVertically) {
             ParkGreenWhiteCheckBox(
                 isChecked = isChecked,
-                onCheckedChanged = onClickAllCheck,
+                onCheckedChanged = onClickAllCheck
             )
             Text(
                 text = stringResource(R.string.check_all),
