@@ -1,5 +1,6 @@
-package com.simullim.common
+package com.simullim.compose
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,26 +11,33 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.simullim.R
+import com.example.common.R
 import com.simullim.compose.ui.theme.DarkGrey
+import com.simullim.compose.ui.theme.Grey81
 import com.simullim.compose.ui.theme.ParkGreen
 import com.simullim.compose.ui.theme.SimullimTheme
 import com.simullim.compose.ui.theme.Typography
@@ -39,18 +47,21 @@ fun RoundedParkGreenButton(
     onClick: () -> Unit,
     buttonText: String,
     modifier: Modifier = Modifier,
+    isEnabled: Boolean = true,
     innerPaddingHorizontal: Dp = 0.dp,
     innerPaddingVertical: Dp = 0.dp
 ) {
+    val color = if (isEnabled) ParkGreen else Grey81
     OutlinedButton(
         onClick = onClick, modifier = modifier,
         shape = RoundedCornerShape(10.dp),
-        border = BorderStroke(2.dp, ParkGreen)
+        enabled = isEnabled,
+        border = BorderStroke(2.dp, color),
     ) {
         Text(
             text = buttonText,
             textAlign = TextAlign.Center,
-            color = ParkGreen,
+            color = color,
             modifier = Modifier.padding(
                 horizontal = innerPaddingHorizontal,
                 vertical = innerPaddingVertical
@@ -62,7 +73,10 @@ fun RoundedParkGreenButton(
 @Composable
 @Preview(showBackground = true)
 private fun RoundedParkGreenButtonPreview() {
-    RoundedParkGreenButton({}, buttonText = "test")
+    Column(Modifier.background(Color.DarkGray)) {
+        RoundedParkGreenButton({}, buttonText = "test")
+        RoundedParkGreenButton({}, buttonText = "test", isEnabled = false)
+    }
 }
 
 @Composable
@@ -79,7 +93,6 @@ fun RoundedParkGreenBox(
                 color = ParkGreen,
                 shape = RoundedCornerShape(radius)
             )
-            .background(color = DarkGrey)
     ) {
         boxScope()
     }
@@ -99,8 +112,8 @@ fun TwoButtonDialog(
     content: String,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
-    dismissText: String = stringResource(R.string.cancel),
-    confirmText: String = stringResource(R.string.confirm)
+    dismissText: String,
+    confirmText: String
 ) {
     Dialog(
         onDismissRequest = onDismiss,
@@ -162,5 +175,80 @@ private fun TwoButtonDialogPreview() {
         ) {
             TwoButtonDialog("title", "content", {}, {}, "취소", "확인")
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CommonHeader(
+    title: String,
+    modifier: Modifier = Modifier,
+    leftIcon: CommonHeaderIcon? = null,
+    rightIcon: CommonHeaderIcon? = null,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.height(dimensionResource(R.dimen.header_height))
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(start = 16.dp)
+                .size(24.dp)
+        ) {
+            leftIcon?.let {
+                IconButton(onClick = it.onClick) {
+                    Icon(
+                        painter = painterResource(it.drawableRes),
+                        tint = { Color.White },
+                        contentDescription = null
+                    )
+                }
+            }
+        }
+
+        Text(
+            text = title,
+            style = Typography.titleLarge,
+            color = Color.White,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 16.dp)
+        )
+
+        Box(
+            modifier = Modifier
+                .padding(end = 16.dp)
+                .size(24.dp)
+        ) {
+            rightIcon?.let {
+                IconButton(onClick = it.onClick) {
+                    Icon(
+                        painter = painterResource(it.drawableRes),
+                        tint = { Color.White },
+                        contentDescription = null
+                    )
+                }
+            }
+        }
+    }
+}
+
+data class CommonHeaderIcon(
+    @DrawableRes val drawableRes: Int,
+    val onClick: () -> Unit
+)
+
+@Composable
+@Preview(showBackground = true)
+fun CommonHeaderPreview() {
+    Box(modifier = Modifier.background(DarkGrey)) {
+        CommonHeader(
+            "title 12312897391823791",
+            leftIcon = CommonHeaderIcon(R.drawable.baseline_arrow_back_ios_new_24, {}),
+            rightIcon = CommonHeaderIcon(R.drawable.baseline_arrow_back_ios_new_24, {})
+        )
     }
 }

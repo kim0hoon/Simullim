@@ -12,3 +12,5 @@ val Pink40 = Color(0xFF7D5260)
 
 val DarkGrey = Color(0xFF222222)
 val ParkGreen = Color(0xFF00FF80)
+val Grey81 = Color(0xFF818181)
+val GreyD4 = Color(0xFFD4D4D4)

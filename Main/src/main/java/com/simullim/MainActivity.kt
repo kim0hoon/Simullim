@@ -18,7 +18,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.simullim.R
-import com.simullim.common.TwoButtonDialog
+import com.simullim.compose.TwoButtonDialog
 import com.simullim.compose.ui.theme.DarkGrey
 import com.simullim.compose.ui.theme.SimullimTheme
 import com.simullim.main.MainScreen
@@ -64,7 +64,9 @@ class MainActivity : FragmentActivity() {
             title = stringResource(R.string.quit_dialog_title),
             content = stringResource(R.string.quit_dialog_content),
             onDismiss = onDismiss,
-            onConfirm = onConfirm
+            onConfirm = onConfirm,
+            dismissText = stringResource(R.string.cancel),
+            confirmText = stringResource(R.string.confirm)
         )
     }
 }

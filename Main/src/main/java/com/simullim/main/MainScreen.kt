@@ -12,12 +12,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.simullim.R
-import com.simullim.common.RoundedParkGreenBox
-import com.simullim.common.RoundedParkGreenButton
+import com.simullim.compose.RoundedParkGreenBox
+import com.simullim.compose.RoundedParkGreenButton
 
 @Composable
 fun MainScreen(onClickStart: () -> Unit, onClickQuit: () -> Unit) {
-    RoundedParkGreenBox(modifier = Modifier.fillMaxHeight()) {
+    RoundedParkGreenBox(
+        modifier = Modifier
+            .padding(4.dp)
+            .fillMaxHeight()
+    ) {
         Column(modifier = Modifier.padding(16.dp)) {
             RoundedParkGreenButton(
                 onClick = onClickStart,
