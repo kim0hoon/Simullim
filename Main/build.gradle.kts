@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.fragment.compose)
     implementation(project(":common"))
     implementation(project(":music-picker"))
+    implementation(project(":gps-tracker"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

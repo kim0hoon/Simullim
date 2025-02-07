@@ -1,6 +1,8 @@
 package com.simullim
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
@@ -17,17 +19,25 @@ import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.music_picker.MusicPickerResultContract
 import com.example.simullim.R
 import com.simullim.compose.TwoButtonDialog
 import com.simullim.compose.ui.theme.DarkGrey
 import com.simullim.compose.ui.theme.SimullimTheme
 import com.simullim.main.MainScreen
+import com.simullim.service.PlayService
 import com.simullim.start.StartScreen
 
-class MainActivity : FragmentActivity() {
+class MainActivity : FragmentActivity(), MainEventReceiver {
     private val mainViewModel by viewModels<MainViewModel>()
+    private val playlistResult = registerForActivityResult(MusicPickerResultContract()) {
+        //TODO playitem
+        Log.d("TESTLOG", "$it")
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        initFlow()
         setContent {
             val navController = rememberNavController()
             var showQuitDialog by remember { mutableStateOf(false) }
@@ -48,7 +58,7 @@ class MainActivity : FragmentActivity() {
                     }
 
                     composable(route = Page.START.name) {
-                        StartScreen()
+                        StartScreen(mainViewModel = mainViewModel)
                     }
                 }
                 if (showQuitDialog) {
@@ -68,5 +78,21 @@ class MainActivity : FragmentActivity() {
             dismissText = stringResource(R.string.cancel),
             confirmText = stringResource(R.string.confirm)
         )
+    }
+
+    private fun initFlow() {
+        mainViewModel.mainEventFlow.collectOnLifecycle(lifecycleOwner = this) {
+            Log.d("TESTLOG", "event $it")
+            handleEvent(it)
+        }
+    }
+
+    override fun onPlay() {
+        val intent = Intent(this, PlayService::class.java)
+        startForegroundService(intent)
+    }
+
+    override fun onSetPlaylist() {
+        playlistResult.launch(Unit)
     }
 }
