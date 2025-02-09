@@ -1,6 +1,5 @@
 package com.example.gps_tracker
 
-import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.location.LocationListener
 import android.location.LocationManager
@@ -20,7 +19,7 @@ class GpsTracker(private val locationManager: LocationManager) {
             }
         }
 
-    @RequiresPermission(anyOf = [ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION])
+    @RequiresPermission(ACCESS_FINE_LOCATION)
     fun start() {
         locationManager.requestLocationUpdates(
             LocationManager.GPS_PROVIDER,

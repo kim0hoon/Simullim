@@ -1,5 +1,6 @@
 package com.simullim
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -37,6 +38,28 @@ internal class MainActivity : FragmentActivity(), MainEventReceiver {
         Log.d("TESTLOG", "$it")
     }
     private val playServiceConnection = PlayServiceConnection()
+    private val locationPermissionManager =
+        PermissionManager(
+            activity = this,
+            onGranted = {
+                val intent = Intent(this, PlayService::class.java)
+                startForegroundService(intent)
+                playServiceConnection.service?.start(onDenied = {
+                    Log.d(
+                        "TESTLOG",
+                        "start denied"
+                    )
+                })
+            },
+            onShouldShowRationale = {
+                Log.d("TESTLOG", "onShouldShow")
+            },
+            onDenied = {
+                Log.d("TESTLOG", "onDenied $it")
+            },
+            permissions = listOf(Manifest.permission.ACCESS_FINE_LOCATION)
+        )
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,8 +125,7 @@ internal class MainActivity : FragmentActivity(), MainEventReceiver {
     }
 
     override fun onPlay() {
-        val intent = Intent(this, PlayService::class.java)
-        startForegroundService(intent)
+        locationPermissionManager.executeWithCheckPermissions()
     }
 
     override fun onSetPlaylist() {
