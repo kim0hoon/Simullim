@@ -6,7 +6,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
+internal class MainViewModel : ViewModel() {
     private val _mainEvent = Channel<MainEvent>(capacity = 10)
     val mainEventFlow = _mainEvent.receiveAsFlow()
 

@@ -1,5 +1,6 @@
 package com.simullim
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -26,14 +27,16 @@ import com.simullim.compose.ui.theme.DarkGrey
 import com.simullim.compose.ui.theme.SimullimTheme
 import com.simullim.main.MainScreen
 import com.simullim.service.PlayService
+import com.simullim.service.PlayServiceConnection
 import com.simullim.start.StartScreen
 
-class MainActivity : FragmentActivity(), MainEventReceiver {
+internal class MainActivity : FragmentActivity(), MainEventReceiver {
     private val mainViewModel by viewModels<MainViewModel>()
     private val playlistResult = registerForActivityResult(MusicPickerResultContract()) {
         //TODO playitem
         Log.d("TESTLOG", "$it")
     }
+    private val playServiceConnection = PlayServiceConnection()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +71,18 @@ class MainActivity : FragmentActivity(), MainEventReceiver {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        Intent(this, PlayService::class.java).also { intent ->
+            bindService(intent, playServiceConnection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unbindService(playServiceConnection)
+    }
+
     @Composable
     private fun QuitDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
         TwoButtonDialog(
@@ -82,7 +97,6 @@ class MainActivity : FragmentActivity(), MainEventReceiver {
 
     private fun initFlow() {
         mainViewModel.mainEventFlow.collectOnLifecycle(lifecycleOwner = this) {
-            Log.d("TESTLOG", "event $it")
             handleEvent(it)
         }
     }

@@ -1,6 +1,6 @@
 package com.simullim
 
-enum class MainEvent {
+internal enum class MainEvent {
     PLAY,
     SET_PLAYLIST
 }

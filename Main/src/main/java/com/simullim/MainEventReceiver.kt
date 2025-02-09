@@ -1,6 +1,6 @@
 package com.simullim
 
-interface MainEventReceiver {
+internal interface MainEventReceiver {
     fun handleEvent(mainEvent: MainEvent) {
         when (mainEvent) {
             MainEvent.PLAY -> onPlay()
