@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.LocationManager
 import android.os.Binder
 import android.os.IBinder
 import androidx.core.app.ActivityCompat
@@ -16,8 +15,11 @@ import com.example.simullim.R
 
 internal class PlayService : Service() {
     private val gpsTracker by lazy {
-        GpsTracker(getSystemService(LocationManager::class.java))
+        GpsTracker(this)
     }
+
+    val gpsDataStateFlow get() = gpsTracker.gpsDataStateFlow
+    val errorEventFlow get() = gpsTracker.errorEventFlow
 
     override fun onCreate() {
         super.onCreate()
@@ -39,6 +41,10 @@ internal class PlayService : Service() {
 
     override fun onBind(intent: Intent?): IBinder = PlayServiceBinder()
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        return START_STICKY
+    }
+
     fun start(onDenied: () -> Unit) {
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -52,11 +58,11 @@ internal class PlayService : Service() {
     }
 
     fun pause() {
-
+        gpsTracker.pause()
     }
 
     fun stop() {
-
+        gpsTracker.stop()
     }
 
     inner class PlayServiceBinder : Binder() {

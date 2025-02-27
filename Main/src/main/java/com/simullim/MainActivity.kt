@@ -1,10 +1,7 @@
 package com.simullim
 
 import android.Manifest
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
@@ -27,35 +24,34 @@ import com.simullim.compose.TwoButtonDialog
 import com.simullim.compose.ui.theme.DarkGrey
 import com.simullim.compose.ui.theme.SimullimTheme
 import com.simullim.main.MainScreen
-import com.simullim.service.PlayService
-import com.simullim.service.PlayServiceConnection
+import com.simullim.service.PlayServiceManager
 import com.simullim.start.StartScreen
+import timber.log.Timber
 
 internal class MainActivity : FragmentActivity(), MainEventReceiver {
     private val mainViewModel by viewModels<MainViewModel>()
     private val playlistResult = registerForActivityResult(MusicPickerResultContract()) {
         //TODO playitem
-        Log.d("TESTLOG", "$it")
+        Timber.d("playlist : $it")
     }
-    private val playServiceConnection = PlayServiceConnection()
+    private val playServiceManager = PlayServiceManager(
+        lifecycleOwner = this,
+        context = this,
+        onGpsDataEmitted = {
+            Timber.d("data emitted : $it")
+        },
+        onErrorEvent = {})
     private val locationPermissionManager =
         PermissionManager(
             activity = this,
             onGranted = {
-                val intent = Intent(this, PlayService::class.java)
-                startForegroundService(intent)
-                playServiceConnection.service?.start(onDenied = {
-                    Log.d(
-                        "TESTLOG",
-                        "start denied"
-                    )
-                })
+                playServiceManager.startService()
             },
             onShouldShowRationale = {
-                Log.d("TESTLOG", "onShouldShow")
+                Timber.d("onShouldShow")
             },
             onDenied = {
-                Log.d("TESTLOG", "onDenied $it")
+                Timber.d("onDenied : $it")
             },
             permissions = listOf(Manifest.permission.ACCESS_FINE_LOCATION)
         )
@@ -92,18 +88,6 @@ internal class MainActivity : FragmentActivity(), MainEventReceiver {
                 }
             }
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        Intent(this, PlayService::class.java).also { intent ->
-            bindService(intent, playServiceConnection, Context.BIND_AUTO_CREATE)
-        }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        unbindService(playServiceConnection)
     }
 
     @Composable
