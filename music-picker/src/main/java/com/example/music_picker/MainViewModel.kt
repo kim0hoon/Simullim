@@ -20,7 +20,7 @@ internal class MainViewModel : ViewModel() {
     fun setPlayItems(items: List<PlayItem>) {
         _playItemsStateFlow.update {
             LinkedHashMap<String, PlayItem>().apply {
-                putAll(items.associateBy { it.key })
+                putAll(items.associateBy { it.musicModel.key })
             }
         }
     }
@@ -29,7 +29,7 @@ internal class MainViewModel : ViewModel() {
         _playItemsStateFlow.update {
             LinkedHashMap(it).apply {
                 items.forEach { item ->
-                    putIfAbsent(item.key, item)
+                    putIfAbsent(item.musicModel.key, item)
                 }
             }
         }
@@ -39,7 +39,7 @@ internal class MainViewModel : ViewModel() {
         _playItemsStateFlow.update {
             LinkedHashMap(it).apply {
                 items.forEach { item ->
-                    remove(item.key)
+                    remove(item.musicModel.key)
                 }
             }
         }

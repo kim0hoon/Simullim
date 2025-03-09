@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.music_picker.model.MusicModel
 import com.example.music_picker.model.PlayItem
 import com.simullim.compose.CommonHeader
 import com.simullim.compose.CommonHeaderIcon
@@ -58,11 +59,12 @@ class MainActivity : ComponentActivity() {
                             displayName
                         } ?: unknownString
                     uri.path?.let { path ->
-                        PlayItem(
+                        val musicModel = MusicModel(
                             uriString = path,
                             title = title,
                             durationMillis = duration?.toLong()
                         )
+                        PlayItem(musicModel = musicModel)
                     }
                 }
                 metadataRetriever.release()
@@ -112,7 +114,7 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
                     val selected = playItems.filter { it.isChecked }
-                    val sumOfDurations = selected.sumOf { it.durationMillis ?: 0L }
+                    val sumOfDurations = selected.sumOf { it.musicModel.durationMillis ?: 0L }
                     val durationString = millsToHourMinSecString(sumOfDurations)
                     val text =
                         stringResource(R.string.playlist_select, selected.size, durationString)
@@ -123,7 +125,7 @@ class MainActivity : ComponentActivity() {
                             val result = Intent().apply {
                                 putParcelableArrayListExtra(
                                     PLAYLIST_RESULT_KEY,
-                                    ArrayList(selected)
+                                    ArrayList(selected.map { it.musicModel })
                                 )
                             }
                             setResult(RESULT_OK, result)

@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.music_picker.model.MusicModel
 import com.example.music_picker.model.PlayItem
 import com.simullim.compose.RoundedParkGreenBox
 import com.simullim.compose.RoundedParkGreenButton
@@ -68,7 +69,7 @@ internal fun PlayList(
                 itemsIndexed(playItems) { idx, playItem ->
                     PlayListItem(
                         model = playItem,
-                        onCheckedChanged = { onCheckedChanged(playItem.key, it) },
+                        onCheckedChanged = { onCheckedChanged(playItem.musicModel.key, it) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = (if (idx == 0) 0 else 4).dp)
@@ -94,7 +95,11 @@ private fun PlayListEmptyPreview() {
 @Preview(showBackground = true)
 private fun PlayListPreview() {
     PlayList(
-        List(20) { PlayItem("", "title $it", 0) }, { _, _ -> }, {}, {}, modifier = Modifier
+        List(20) { PlayItem(musicModel = MusicModel("", "title $it", 0)) },
+        { _, _ -> },
+        {},
+        {},
+        modifier = Modifier
             .background(Color.DarkGray)
             .width(400.dp)
             .height(700.dp)
@@ -118,14 +123,14 @@ internal fun PlayListItem(
                     .padding(end = 4.dp)
             ) {
                 Text(
-                    text = model.title,
+                    text = model.musicModel.title,
                     style = Typography.bodyMedium,
                     color = Color.White,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = model.durationMillis?.let {
+                    text = model.musicModel.durationMillis?.let {
                         millsToMinSecString(it)
                     } ?: stringResource(R.string.unknown),
                     style = Typography.bodySmall,
@@ -149,17 +154,21 @@ private fun PlayListItemPreview() {
     Column {
         PlayListItem(
             model = PlayItem(
-                "",
-                "title test 123123123123123123123123123123123123123123123123123",
-                123,
+                MusicModel(
+                    "",
+                    "title test 123123123123123123123123123123123123123123123123123",
+                    123
+                ),
                 false
             ), { _ -> })
 
         PlayListItem(
             model = PlayItem(
-                "",
-                "title test",
-                1231,
+                MusicModel(
+                    "",
+                    "title test",
+                    1231
+                ),
                 true
             ), { _ -> })
     }
