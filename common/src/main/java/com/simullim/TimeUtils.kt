@@ -11,7 +11,7 @@ fun millsToHourMinSecString(mills: Long): String {
 
 fun millsToMinSecString(mills: Long): String {
     val min = millsToMin(mills)
-    val sec = millsToSec(mills)
+    val sec = millsToSec(mills) % 60
     return String.format(null, "%d:%02d", min, sec)
 }
 
