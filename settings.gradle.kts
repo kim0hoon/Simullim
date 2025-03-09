@@ -23,3 +23,4 @@ rootProject.name = "Simullim"
 include(":main")
 include(":common")
 include(":music-picker")
+include(":gps-tracker")

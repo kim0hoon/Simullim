@@ -1,5 +1,6 @@
 package com.simullim
 
+import android.Manifest
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -17,17 +18,48 @@ import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.music_picker.MusicPickerResultContract
 import com.example.simullim.R
 import com.simullim.compose.TwoButtonDialog
 import com.simullim.compose.ui.theme.DarkGrey
 import com.simullim.compose.ui.theme.SimullimTheme
 import com.simullim.main.MainScreen
+import com.simullim.service.PlayServiceManager
 import com.simullim.start.StartScreen
+import timber.log.Timber
 
-class MainActivity : FragmentActivity() {
+internal class MainActivity : FragmentActivity(), MainEventReceiver {
     private val mainViewModel by viewModels<MainViewModel>()
+    private val playlistResult = registerForActivityResult(MusicPickerResultContract()) {
+        //TODO playitem
+        Timber.d("playlist : $it")
+    }
+    private val playServiceManager = PlayServiceManager(
+        lifecycleOwner = this,
+        context = this,
+        onGpsDataEmitted = {
+            Timber.d("data emitted : $it")
+        },
+        onErrorEvent = {})
+    private val locationPermissionManager =
+        PermissionManager(
+            activity = this,
+            onGranted = {
+                playServiceManager.startService()
+            },
+            onShouldShowRationale = {
+                Timber.d("onShouldShow")
+            },
+            onDenied = {
+                Timber.d("onDenied : $it")
+            },
+            permissions = listOf(Manifest.permission.ACCESS_FINE_LOCATION)
+        )
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        initFlow()
         setContent {
             val navController = rememberNavController()
             var showQuitDialog by remember { mutableStateOf(false) }
@@ -48,7 +80,7 @@ class MainActivity : FragmentActivity() {
                     }
 
                     composable(route = Page.START.name) {
-                        StartScreen()
+                        StartScreen(mainViewModel = mainViewModel)
                     }
                 }
                 if (showQuitDialog) {
@@ -68,5 +100,19 @@ class MainActivity : FragmentActivity() {
             dismissText = stringResource(R.string.cancel),
             confirmText = stringResource(R.string.confirm)
         )
+    }
+
+    private fun initFlow() {
+        mainViewModel.mainEventFlow.collectOnLifecycle(lifecycleOwner = this) {
+            handleEvent(it)
+        }
+    }
+
+    override fun onPlay() {
+        locationPermissionManager.executeWithCheckPermissions()
+    }
+
+    override fun onSetPlaylist() {
+        playlistResult.launch(Unit)
     }
 }

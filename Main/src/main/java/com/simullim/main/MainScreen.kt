@@ -16,7 +16,7 @@ import com.simullim.compose.RoundedParkGreenBox
 import com.simullim.compose.RoundedParkGreenButton
 
 @Composable
-fun MainScreen(onClickStart: () -> Unit, onClickQuit: () -> Unit) {
+internal fun MainScreen(onClickStart: () -> Unit, onClickQuit: () -> Unit) {
     RoundedParkGreenBox(
         modifier = Modifier
             .padding(4.dp)

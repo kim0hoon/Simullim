@@ -1,6 +1,6 @@
 package com.simullim
 
-enum class Page {
+internal enum class Page {
     MAIN,
     START
 }
