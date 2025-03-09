@@ -24,12 +24,15 @@ import com.simullim.compose.TwoButtonDialog
 import com.simullim.compose.ui.theme.DarkGrey
 import com.simullim.compose.ui.theme.SimullimTheme
 import com.simullim.main.MainScreen
+import com.simullim.playinfo.PlayInfoViewModel
 import com.simullim.service.PlayServiceManager
 import com.simullim.start.StartScreen
 import timber.log.Timber
 
 internal class MainActivity : FragmentActivity(), MainEventReceiver {
     private val mainViewModel by viewModels<MainViewModel>()
+    private val playInfoViewModel by viewModels<PlayInfoViewModel>()
+
     private val playlistResult = registerForActivityResult(MusicPickerResultContract()) {
         //TODO playitem
         Timber.d("playlist : $it")
