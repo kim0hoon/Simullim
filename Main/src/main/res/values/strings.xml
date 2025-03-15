@@ -7,4 +7,8 @@
     <string name="quit_dialog_title">종료</string>
     <string name="quit_dialog_content">종료 하시겠습니까?</string>
     <string name="play_channel_name">플레이 알림</string>
+    <string name="start_playlist_title">플레이리스트</string>
+    <string name="start_playlist_empty">아래 버튼을 눌러\n플레이리스트를 선택해보세요! </string>
+    <string name="start_playlist_select">플레이리스트 선택</string>
+    <string name="start_playlist_total_duration">플레이리스트 총 시간 %s</string>
 </resources>

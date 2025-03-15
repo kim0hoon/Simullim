@@ -83,7 +83,7 @@ internal class MainActivity : FragmentActivity(), MainEventReceiver {
                     }
 
                     composable(route = Page.START.name) {
-                        StartScreen(mainViewModel = mainViewModel)
+                        StartScreen()
                     }
                 }
                 if (showQuitDialog) {
