@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,8 +27,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -251,4 +255,128 @@ fun CommonHeaderPreview() {
             rightIcon = CommonHeaderIcon(R.drawable.baseline_arrow_back_ios_new_24, {})
         )
     }
+}
+
+@Composable
+private fun NumberTextField(
+    value: Int,
+    onValueChanged: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = Typography.bodySmall,
+    range: IntRange = Int.MIN_VALUE..Int.MAX_VALUE
+) {
+    RoundedParkGreenBox(modifier = modifier) {
+        BasicTextField(
+            value = value.toString(),
+            onValueChange = {
+                onValueChanged((it.toIntOrNull() ?: 0).coerceIn(range))
+            },
+            textStyle = textStyle.copy(color = Color.White, textAlign = TextAlign.Center),
+            singleLine = true,
+            cursorBrush = SolidColor(Color.White),
+            modifier = Modifier
+                .padding(horizontal = 4.dp, vertical = 4.dp)
+        )
+    }
+}
+
+@Composable
+private fun NumberInputSlot(
+    textFieldValue: Int,
+    onValueChanged: (Int) -> Unit,
+    unitText: String,
+    modifier: Modifier = Modifier,
+    range: IntRange = Int.MIN_VALUE..Int.MAX_VALUE
+) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
+        NumberTextField(
+            value = textFieldValue,
+            onValueChanged = onValueChanged,
+            modifier = Modifier
+                .width(48.dp)
+                .padding(end = 2.dp),
+            range = range
+        )
+        Text(
+            text = unitText,
+            color = Color.White,
+            style = Typography.labelSmall
+        )
+    }
+}
+
+/**
+ * @param input : 초기 input(초단위)
+ * @param onValueChanged : 값이 변경될 때(초단위)
+ */
+@Composable
+fun TimeRollingSelector(input: Int, onValueChanged: (Int) -> Unit, modifier: Modifier = Modifier) {
+    val seconds = input % 60
+    val minutes = (input / 60) % 60
+    val hours = input / 3600
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
+        NumberInputSlot(
+            textFieldValue = hours,
+            onValueChanged = { onValueChanged(getSeconds(it, minutes, seconds)) },
+            unitText = stringResource(R.string.hour),
+            range = 0..1000
+        )
+        NumberInputSlot(
+            textFieldValue = minutes,
+            onValueChanged = { onValueChanged(getSeconds(hours, it, seconds)) },
+            unitText = stringResource(R.string.minute),
+            modifier = Modifier.padding(start = 4.dp),
+            range = 0..59
+        )
+        NumberInputSlot(
+            textFieldValue = seconds,
+            onValueChanged = { onValueChanged(getSeconds(hours, minutes, it)) },
+            unitText = stringResource(R.string.second),
+            modifier = Modifier.padding(start = 4.dp),
+            range = 0..59
+        )
+    }
+}
+
+private fun getSeconds(hours: Int, minutes: Int, seconds: Int) =
+    hours * 3600 + minutes * 60 + seconds
+
+@Composable
+@Preview
+private fun TimeRollingSelectorPreview() {
+    TimeRollingSelector(3661, {})
+}
+
+/**
+ * @param input : meter 단위의 정수형
+ * @param onValueChanged : 텍스트 변경 시 meter 단위의 정수형으로 반환
+ */
+@Composable
+fun DistanceRollingSelector(
+    input: Int,
+    onValueChanged: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val kiloMeter = input / 1000
+    val meter = input % 1000
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
+        NumberInputSlot(
+            textFieldValue = kiloMeter,
+            onValueChanged = { onValueChanged(it * 1000 + meter) },
+            unitText = stringResource(R.string.kilo_meter)
+        )
+        NumberInputSlot(
+            textFieldValue = meter,
+            onValueChanged = { onValueChanged(kiloMeter * 1000 + meter) },
+            unitText = stringResource(R.string.meter),
+            modifier = Modifier.padding(start = 4.dp),
+            range = 0..999
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun DistanceRollingSelectorPreview() {
+    DistanceRollingSelector(1982, {})
 }
