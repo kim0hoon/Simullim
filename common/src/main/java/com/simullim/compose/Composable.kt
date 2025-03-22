@@ -75,6 +75,33 @@ fun RoundedParkGreenButton(
 }
 
 @Composable
+fun CheckableRoundedParkGreenButton(
+    onClick: () -> Unit,
+    buttonText: String,
+    modifier: Modifier = Modifier,
+    isChecked: Boolean = true,
+    innerPaddingHorizontal: Dp = 0.dp,
+    innerPaddingVertical: Dp = 0.dp
+) {
+    val color = if (isChecked) ParkGreen else Grey81
+    OutlinedButton(
+        onClick = onClick, modifier = modifier,
+        shape = RoundedCornerShape(10.dp),
+        border = BorderStroke(2.dp, color),
+    ) {
+        Text(
+            text = buttonText,
+            textAlign = TextAlign.Center,
+            color = color,
+            modifier = Modifier.padding(
+                horizontal = innerPaddingHorizontal,
+                vertical = innerPaddingVertical
+            )
+        )
+    }
+}
+
+@Composable
 @Preview(showBackground = true)
 private fun RoundedParkGreenButtonPreview() {
     Column(Modifier.background(Color.DarkGray)) {
@@ -310,7 +337,7 @@ private fun NumberInputSlot(
  * @param onValueChanged : 값이 변경될 때(초단위)
  */
 @Composable
-fun TimeRollingSelector(input: Int, onValueChanged: (Int) -> Unit, modifier: Modifier = Modifier) {
+fun TimeTextSelector(input: Int, onValueChanged: (Int) -> Unit, modifier: Modifier = Modifier) {
     val seconds = input % 60
     val minutes = (input / 60) % 60
     val hours = input / 3600
@@ -343,8 +370,8 @@ private fun getSeconds(hours: Int, minutes: Int, seconds: Int) =
 
 @Composable
 @Preview
-private fun TimeRollingSelectorPreview() {
-    TimeRollingSelector(3661, {})
+private fun TimeTextSelectorPreview() {
+    TimeTextSelector(3661, {})
 }
 
 /**
@@ -352,7 +379,7 @@ private fun TimeRollingSelectorPreview() {
  * @param onValueChanged : 텍스트 변경 시 meter 단위의 정수형으로 반환
  */
 @Composable
-fun DistanceRollingSelector(
+fun DistanceTextSelector(
     input: Int,
     onValueChanged: (Int) -> Unit,
     modifier: Modifier = Modifier
@@ -377,6 +404,6 @@ fun DistanceRollingSelector(
 
 @Composable
 @Preview
-private fun DistanceRollingSelectorPreview() {
-    DistanceRollingSelector(1982, {})
+private fun DistanceTextSelectorPreview() {
+    DistanceTextSelector(1982, {})
 }
