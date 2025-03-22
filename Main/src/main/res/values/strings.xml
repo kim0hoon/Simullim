@@ -11,4 +11,7 @@
     <string name="start_playlist_empty">아래 버튼을 눌러\n플레이리스트를 선택해보세요! </string>
     <string name="start_playlist_select">플레이리스트 선택</string>
     <string name="start_playlist_total_duration">플레이리스트 총 시간 %s</string>
+    <string name="start_play_setting_title">트랙길이 &amp; 페이스</string>
+    <string name="start_play_setting_type_time">시간으로 설정</string>
+    <string name="start_play_setting_type_distance">거리로 설정</string>
 </resources>

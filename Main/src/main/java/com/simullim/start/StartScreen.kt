@@ -5,11 +5,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -21,6 +20,7 @@ import com.simullim.compose.ui.theme.DarkGrey
 @Composable
 internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
     val playListModel = startViewModel.startPlayListStateFlow.collectAsStateWithLifecycle().value
+    val paceSettingModel = startViewModel.paceSettingStateFlow.collectAsStateWithLifecycle().value
     RoundedParkGreenBox(
         modifier = Modifier
             .fillMaxSize()
@@ -35,32 +35,23 @@ internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
                 )
             }
             item {
-                HorizontalDivider(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    color = Color.White
+                StartScreenDivider()
+            }
+            item {
+                StartTitle(
+                    title = stringResource(R.string.start_play_setting_title),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
+            item {
+                SelectTypeSection(
+                    type = paceSettingModel.selectedType,
+                    onChecked = startViewModel::setPaceSettingType,
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
             }
         }
     }
-
-//    Column {
-//        Text(
-//            text = "add playlist",
-//            color = Color.White,
-//            fontSize = 32.sp,
-//            modifier = Modifier.clickable {
-//                mainViewModel.sendMainEvent(MainEvent.SET_PLAYLIST)
-//            })
-//
-//        Text(
-//            text = "gps tracking",
-//            color = Color.White,
-//            fontSize = 32.sp,
-//            modifier = Modifier.clickable {
-//                mainViewModel.sendMainEvent(MainEvent.PLAY)
-//            })
-//    }
-
 }
 
 @Composable
