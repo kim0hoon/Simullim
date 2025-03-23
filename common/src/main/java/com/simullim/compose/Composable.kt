@@ -30,7 +30,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -285,11 +284,11 @@ fun CommonHeaderPreview() {
 }
 
 @Composable
-private fun NumberTextField(
+fun NumberTextField(
     value: Int,
     onValueChanged: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    textStyle: TextStyle = Typography.bodySmall,
+    textStyle: TextStyle = Typography.bodyLarge,
     range: IntRange = Int.MIN_VALUE..Int.MAX_VALUE
 ) {
     RoundedParkGreenBox(modifier = modifier) {
@@ -302,108 +301,15 @@ private fun NumberTextField(
             singleLine = true,
             cursorBrush = SolidColor(Color.White),
             modifier = Modifier
-                .padding(horizontal = 4.dp, vertical = 4.dp)
-        )
-    }
-}
-
-@Composable
-private fun NumberInputSlot(
-    textFieldValue: Int,
-    onValueChanged: (Int) -> Unit,
-    unitText: String,
-    modifier: Modifier = Modifier,
-    range: IntRange = Int.MIN_VALUE..Int.MAX_VALUE
-) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
-        NumberTextField(
-            value = textFieldValue,
-            onValueChanged = onValueChanged,
-            modifier = Modifier
-                .width(48.dp)
-                .padding(end = 2.dp),
-            range = range
-        )
-        Text(
-            text = unitText,
-            color = Color.White,
-            style = Typography.labelSmall
-        )
-    }
-}
-
-/**
- * @param input : 초기 input(초단위)
- * @param onValueChanged : 값이 변경될 때(초단위)
- */
-@Composable
-fun TimeTextSelector(input: Int, onValueChanged: (Int) -> Unit, modifier: Modifier = Modifier) {
-    val seconds = input % 60
-    val minutes = (input / 60) % 60
-    val hours = input / 3600
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
-        NumberInputSlot(
-            textFieldValue = hours,
-            onValueChanged = { onValueChanged(getSeconds(it, minutes, seconds)) },
-            unitText = stringResource(R.string.hour),
-            range = 0..1000
-        )
-        NumberInputSlot(
-            textFieldValue = minutes,
-            onValueChanged = { onValueChanged(getSeconds(hours, it, seconds)) },
-            unitText = stringResource(R.string.minute),
-            modifier = Modifier.padding(start = 4.dp),
-            range = 0..59
-        )
-        NumberInputSlot(
-            textFieldValue = seconds,
-            onValueChanged = { onValueChanged(getSeconds(hours, minutes, it)) },
-            unitText = stringResource(R.string.second),
-            modifier = Modifier.padding(start = 4.dp),
-            range = 0..59
-        )
-    }
-}
-
-private fun getSeconds(hours: Int, minutes: Int, seconds: Int) =
-    hours * 3600 + minutes * 60 + seconds
-
-@Composable
-@Preview
-private fun TimeTextSelectorPreview() {
-    TimeTextSelector(3661, {})
-}
-
-/**
- * @param input : meter 단위의 정수형
- * @param onValueChanged : 텍스트 변경 시 meter 단위의 정수형으로 반환
- */
-@Composable
-fun DistanceTextSelector(
-    input: Int,
-    onValueChanged: (Int) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val kiloMeter = input / 1000
-    val meter = input % 1000
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
-        NumberInputSlot(
-            textFieldValue = kiloMeter,
-            onValueChanged = { onValueChanged(it * 1000 + meter) },
-            unitText = stringResource(R.string.kilo_meter)
-        )
-        NumberInputSlot(
-            textFieldValue = meter,
-            onValueChanged = { onValueChanged(kiloMeter * 1000 + meter) },
-            unitText = stringResource(R.string.meter),
-            modifier = Modifier.padding(start = 4.dp),
-            range = 0..999
+                .align(Alignment.Center)
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp, vertical = 8.dp)
         )
     }
 }
 
 @Composable
 @Preview
-private fun DistanceTextSelectorPreview() {
-    DistanceTextSelector(1982, {})
+private fun NumberTextFieldPreview() {
+    NumberTextField(value = 123, {}, modifier = Modifier.height(48.dp))
 }

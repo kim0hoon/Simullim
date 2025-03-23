@@ -2,6 +2,7 @@ package com.simullim.start
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,12 +27,14 @@ internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
             .fillMaxSize()
             .padding(dimensionResource(R.dimen.screen_padding_dp))
     ) {
-        LazyColumn {
+        LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
             item {
                 PlaylistSection(
                     model = playListModel,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    onClick = {}
+                    modifier = Modifier.padding(bottom = 8.dp),
+                    onClick = {
+                        //TODO onClick
+                    }
                 )
             }
             item {
@@ -39,16 +42,25 @@ internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
             }
             item {
                 StartTitle(
-                    title = stringResource(R.string.start_play_setting_title),
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    title = stringResource(R.string.start_play_setting_length_title),
+                    modifier = Modifier.padding(vertical = 8.dp)
                 )
             }
             item {
                 SelectTypeSection(
                     type = paceSettingModel.selectedType,
                     onChecked = startViewModel::setPaceSettingType,
-                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
+            }
+            item {
+                InputTrackLengthSection(
+                    model = paceSettingModel.currentModel,
+                    onValueChanged = startViewModel::setTrackLength,
+                    modifier = Modifier.padding(top = 16.dp, bottom = 12.dp)
+                )
+            }
+            item {
+                StartScreenDivider()
             }
         }
     }

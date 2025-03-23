@@ -24,4 +24,11 @@ internal class StartViewModel : ViewModel() {
             it.copy(selectedType = type)
         }
     }
+
+    fun setTrackLength(length: Int) {
+        _paceSettingStateFlow.update {
+            val updated = it.currentModel.withLength(length = length)
+            it.withCurrentPaceSetting(updated)
+        }
+    }
 }

@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -24,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.simullim.R
 import com.simullim.compose.CheckableRoundedParkGreenButton
+import com.simullim.compose.NumberTextField
 import com.simullim.compose.RoundedParkGreenBox
 import com.simullim.compose.RoundedParkGreenButton
 import com.simullim.compose.ui.theme.GreyD4
@@ -36,7 +38,7 @@ import com.simullim.start.model.StartPlayListModel
 @Composable
 internal fun StartScreenDivider(modifier: Modifier = Modifier) {
     HorizontalDivider(
-        modifier = modifier.padding(horizontal = 16.dp),
+        modifier = modifier,
         color = Color.White
     )
 }
@@ -195,3 +197,124 @@ internal fun SelectTypeSection(
 private fun SelectTypeSectionPreview() {
     SelectTypeSection(type = PaceSetting.Type.Default, onChecked = {})
 }
+
+@Composable
+internal fun InputTrackLengthSection(
+    model: PaceSetting,
+    onValueChanged: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    when (model) {
+        is PaceSetting.TimeType -> {
+            TimeTextSelector(
+                input = model.length,
+                onValueChanged = onValueChanged,
+                modifier = modifier
+            )
+        }
+        is PaceSetting.DistanceType -> {
+            DistanceTextSelector(
+                input = model.length,
+                onValueChanged = onValueChanged,
+                modifier = modifier
+            )
+        }
+    }
+}
+
+@Composable
+@Preview
+private fun InputTrackLengthSectionPreview() {
+    Box(modifier = Modifier.fillMaxWidth()) {
+        InputTrackLengthSection(model = PaceSetting.TimeType(), {})
+    }
+}
+
+
+@Composable
+private fun NumberInputSlot(
+    textFieldValue: Int,
+    onValueChanged: (Int) -> Unit,
+    unitText: String,
+    modifier: Modifier = Modifier,
+    range: IntRange = Int.MIN_VALUE..Int.MAX_VALUE
+) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
+        NumberTextField(
+            value = textFieldValue,
+            onValueChanged = onValueChanged,
+            modifier = Modifier
+                .fillMaxWidth(0.7f)
+                .padding(end = 2.dp),
+            range = range
+        )
+        Text(
+            text = unitText,
+            color = Color.White,
+            style = Typography.labelSmall
+        )
+    }
+}
+
+@Composable
+private fun TimeTextSelector(
+    input: Int,
+    onValueChanged: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val seconds = input % 60
+    val minutes = (input / 60) % 60
+    val hours = input / 3600
+    Column(
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.start_length_selector_padding_dp)),
+        modifier = modifier
+    ) {
+        NumberInputSlot(
+            textFieldValue = hours,
+            onValueChanged = { onValueChanged(getSeconds(it, minutes, seconds)) },
+            unitText = stringResource(R.string.hour),
+            range = 0..1000
+        )
+        NumberInputSlot(
+            textFieldValue = minutes,
+            onValueChanged = { onValueChanged(getSeconds(hours, it, seconds)) },
+            unitText = stringResource(R.string.minute),
+            range = 0..59
+        )
+        NumberInputSlot(
+            textFieldValue = seconds,
+            onValueChanged = { onValueChanged(getSeconds(hours, minutes, it)) },
+            unitText = stringResource(R.string.second),
+            range = 0..59
+        )
+    }
+}
+
+@Composable
+private fun DistanceTextSelector(
+    input: Int,
+    onValueChanged: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val kiloMeter = input / 1000
+    val meter = input % 1000
+    Column(
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.start_length_selector_padding_dp)),
+        modifier = modifier
+    ) {
+        NumberInputSlot(
+            textFieldValue = kiloMeter,
+            onValueChanged = { onValueChanged(it * 1000 + meter) },
+            unitText = stringResource(R.string.kilo_meter)
+        )
+        NumberInputSlot(
+            textFieldValue = meter,
+            onValueChanged = { onValueChanged(kiloMeter * 1000 + meter) },
+            unitText = stringResource(R.string.meter),
+            range = 0..999
+        )
+    }
+}
+
+private fun getSeconds(hours: Int, minutes: Int, seconds: Int) =
+    hours * 3600 + minutes * 60 + seconds
