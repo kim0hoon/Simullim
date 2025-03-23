@@ -163,12 +163,7 @@ internal fun PlaylistItem(
         }
     }
 }
-//TODO 모델 추가
-/**
- * 거리
- * 페이스 조절 칸(구간, 페이스)
- * (페이스 그래프)
- */
+
 @Composable
 internal fun SelectTypeSection(
     type: PaceSetting.Type,
