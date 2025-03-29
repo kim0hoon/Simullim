@@ -117,12 +117,13 @@ fun RoundedParkGreenBox(
     boxScope: @Composable BoxScope.() -> Unit
 ) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .border(
                 width = width,
                 color = ParkGreen,
                 shape = RoundedCornerShape(radius)
             )
+            .then(modifier)
     ) {
         boxScope()
     }
