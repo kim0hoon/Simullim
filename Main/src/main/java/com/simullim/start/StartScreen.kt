@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -30,8 +29,7 @@ internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
         LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
             item {
                 PlaylistSection(
-                    model = playListModel,
-                    modifier = Modifier.padding(bottom = 8.dp),
+                    model = playListModel, modifier = Modifier.padding(bottom = 16.dp),
                     onClick = {
                         //TODO onClick
                     }
@@ -41,22 +39,12 @@ internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
                 StartScreenDivider()
             }
             item {
-                StartTitle(
-                    title = stringResource(R.string.start_play_setting_length_title),
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-            }
-            item {
                 SelectTypeSection(
                     type = paceSettingModel.selectedType,
                     onChecked = startViewModel::setPaceSettingType,
-                )
-            }
-            item {
-                InputTrackLengthSection(
-                    model = paceSettingModel.currentModel,
-                    onValueChanged = startViewModel::setTrackLength,
-                    modifier = Modifier.padding(top = 16.dp, bottom = 12.dp)
+                    length = paceSettingModel.currentModel.length,
+                    onLengthChanged = startViewModel::setTrackLength,
+                    modifier = Modifier.padding(vertical = 16.dp)
                 )
             }
             item {

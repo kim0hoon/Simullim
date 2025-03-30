@@ -49,7 +49,7 @@ internal abstract class PaceSetting {
         }
     }
 
-    data class Pace(val range: IntRange, val value: Int)
+    data class Pace(val start: Int?, val end: Int?, val value: Int?)
 
     data class DistanceType(
         override val length: Int = 0,

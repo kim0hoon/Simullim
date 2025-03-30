@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,10 +15,13 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -25,7 +29,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.simullim.R
 import com.simullim.compose.CheckableRoundedParkGreenButton
-import com.simullim.compose.NumberTextField
+import com.simullim.compose.NumberTextInputDialog
+import com.simullim.compose.NumberTextInputDialogParam
 import com.simullim.compose.RoundedParkGreenBox
 import com.simullim.compose.RoundedParkGreenButton
 import com.simullim.compose.ui.theme.GreyD4
@@ -68,11 +73,13 @@ internal fun PlaylistSection(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        StartTitle(title = stringResource(R.string.start_playlist_title))
+        StartTitle(
+            title = stringResource(R.string.start_playlist_title),
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
         RoundedParkGreenBox(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp)
                 .height(250.dp)
         ) {
             if (model.playlist.isEmpty()) PlaylistEmptyItem(modifier = Modifier.fillMaxSize())
@@ -168,148 +175,173 @@ internal fun PlaylistItem(
 internal fun SelectTypeSection(
     type: PaceSetting.Type,
     onChecked: (PaceSetting.Type) -> Unit,
+    length: Int,
+    onLengthChanged: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = modifier) {
-        CheckableRoundedParkGreenButton(
-            onClick = { onChecked(PaceSetting.Type.Distance) },
-            buttonText = stringResource(R.string.start_play_setting_type_distance),
-            isChecked = type == PaceSetting.Type.Distance,
-            modifier = Modifier.weight(1f)
-        )
-        CheckableRoundedParkGreenButton(
-            onClick = { onChecked(PaceSetting.Type.Time) },
-            buttonText = stringResource(R.string.start_play_setting_type_time),
-            isChecked = type == PaceSetting.Type.Time,
-            modifier = Modifier.weight(1f)
-        )
+    var showLengthInputDialog by rememberSaveable { mutableStateOf(false) }
+    if (showLengthInputDialog) {
+        when (type) {
+            PaceSetting.Type.Time -> TimeInputDialog(
+                onConfirm = {
+                    onLengthChanged(it)
+                    showLengthInputDialog = false
+                },
+                onDismiss = { showLengthInputDialog = false })
+            PaceSetting.Type.Distance -> DistanceInputDialog(
+                onConfirm = {
+                    onLengthChanged(it)
+                    showLengthInputDialog = false
+                },
+                onDismiss = { showLengthInputDialog = false })
+        }
     }
+    Column(modifier = modifier) {
+        StartTitle(
+            title = stringResource(R.string.start_play_setting_length_title),
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            CheckableRoundedParkGreenButton(
+                onClick = { onChecked(PaceSetting.Type.Distance) },
+                buttonText = stringResource(R.string.start_play_setting_type_distance),
+                isChecked = type == PaceSetting.Type.Distance,
+                modifier = Modifier.weight(1f)
+            )
+            CheckableRoundedParkGreenButton(
+                onClick = { onChecked(PaceSetting.Type.Time) },
+                buttonText = stringResource(R.string.start_play_setting_type_time),
+                isChecked = type == PaceSetting.Type.Time,
+                modifier = Modifier.weight(1f)
+            )
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+            val total = when (type) {
+                PaceSetting.Type.Distance -> length.toTotalDistanceString()
+                PaceSetting.Type.Time -> length.toTotalTimeString()
+            }
+            val totalLength = stringResource(R.string.total_length)
+            Text(
+                text = "$totalLength $total",
+                color = Color.White,
+                style = Typography.titleMedium
+            )
+//            Text(
+//                text = total,
+//                color = Color.LightGray,
+//                style = Typography.bodyLarge,
+//                textAlign = TextAlign.Center,
+//                modifier = Modifier.padding(start = 4.dp)
+//            )
+            Spacer(modifier.weight(1f))
+            RoundedParkGreenButton(
+                onClick = { showLengthInputDialog = true },
+                buttonText = stringResource(R.string.start_play_setting_input_length),
+            )
+        }
+    }
+}
 
+private fun Int.toTotalDistanceString(): String {
+    if (this@toTotalDistanceString == 0) return "0m"
+    val km = this@toTotalDistanceString / 1000
+    val m = this@toTotalDistanceString % 1000
+    return buildList {
+        if (km != 0) add("${km}km")
+        if (m != 0) add("${m}m")
+    }.joinToString(separator = " ")
+}
+
+private fun Int.toTotalTimeString(): String {
+    if (this@toTotalTimeString == 0) return "0초"
+    val hour = this@toTotalTimeString / 3600
+    val min = (this@toTotalTimeString / 60) % 60
+    val sec = this@toTotalTimeString % 60
+    return buildList {
+        if (hour != 0) add("${hour}시간")
+        if (min != 0) add("${min}분")
+        if (sec != 0) add("${sec}초")
+    }.joinToString(separator = " ")
 }
 
 @Composable
 @Preview
 private fun SelectTypeSectionPreview() {
-    SelectTypeSection(type = PaceSetting.Type.Default, onChecked = {})
+    SelectTypeSection(type = PaceSetting.Type.Default, onChecked = {}, 0, {})
 }
 
 @Composable
-internal fun InputTrackLengthSection(
-    model: PaceSetting,
-    onValueChanged: (Int) -> Unit,
+internal fun TimeInputDialog(
+    onConfirm: (Int) -> Unit,
+    onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    when (model) {
-        is PaceSetting.TimeType -> {
-            TimeTextSelector(
-                input = model.length,
-                onValueChanged = onValueChanged,
-                modifier = modifier
-            )
-        }
-        is PaceSetting.DistanceType -> {
-            DistanceTextSelector(
-                input = model.length,
-                onValueChanged = onValueChanged,
-                modifier = modifier
-            )
-        }
-    }
+    val params = arrayOf(
+        NumberTextInputDialogParam(
+            toResult = { it * 3600 },
+            text = stringResource(R.string.hour2),
+            range = 0..1000
+        ),
+        NumberTextInputDialogParam(
+            toResult = { it * 60 },
+            text = stringResource(R.string.minute),
+            range = 0..59
+        ),
+        NumberTextInputDialogParam(
+            toResult = { it },
+            text = stringResource(R.string.second),
+            range = 0..59
+        )
+    )
+    NumberTextInputDialog(
+        title = stringResource(R.string.time_input_dialog_title),
+        params = params,
+        confirmText = stringResource(R.string.confirm),
+        onConfirm = onConfirm,
+        cancelText = stringResource(R.string.cancel),
+        onCancel = onDismiss,
+        modifier = modifier
+    )
+}
+
+@Composable
+internal fun DistanceInputDialog(
+    onConfirm: (Int) -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val params = arrayOf(
+        NumberTextInputDialogParam(
+            toResult = { it * 1000 },
+            text = stringResource(R.string.kilo_meter),
+            range = 0..1000
+        ),
+        NumberTextInputDialogParam(
+            toResult = { it }, text = stringResource(R.string.meter),
+            range = 0..999
+        ),
+    )
+    NumberTextInputDialog(
+        params = params,
+        title = stringResource(R.string.distance_input_dialog_title),
+        confirmText = stringResource(R.string.confirm),
+        onConfirm = onConfirm,
+        cancelText = stringResource(R.string.cancel),
+        onCancel = onDismiss,
+        modifier = modifier
+    )
+}
+
+@Composable
+internal fun PaceItem(pace: PaceSetting.Pace) {
+
 }
 
 @Composable
 @Preview
-private fun InputTrackLengthSectionPreview() {
-    Box(modifier = Modifier.fillMaxWidth()) {
-        InputTrackLengthSection(model = PaceSetting.TimeType(), {})
-    }
+private fun PaceItemPreview() {
+    PaceItem(pace = PaceSetting.Pace(10, 11, 12))
 }
-
-
-@Composable
-private fun NumberInputSlot(
-    textFieldValue: Int,
-    onValueChanged: (Int) -> Unit,
-    unitText: String,
-    modifier: Modifier = Modifier,
-    range: IntRange = Int.MIN_VALUE..Int.MAX_VALUE
-) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
-        NumberTextField(
-            value = textFieldValue,
-            onValueChanged = onValueChanged,
-            modifier = Modifier
-                .fillMaxWidth(0.7f)
-                .padding(end = 2.dp),
-            range = range
-        )
-        Text(
-            text = unitText,
-            color = Color.White,
-            style = Typography.labelSmall
-        )
-    }
-}
-
-@Composable
-private fun TimeTextSelector(
-    input: Int,
-    onValueChanged: (Int) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val seconds = input % 60
-    val minutes = (input / 60) % 60
-    val hours = input / 3600
-    Column(
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.start_length_selector_padding_dp)),
-        modifier = modifier
-    ) {
-        NumberInputSlot(
-            textFieldValue = hours,
-            onValueChanged = { onValueChanged(getSeconds(it, minutes, seconds)) },
-            unitText = stringResource(R.string.hour),
-            range = 0..1000
-        )
-        NumberInputSlot(
-            textFieldValue = minutes,
-            onValueChanged = { onValueChanged(getSeconds(hours, it, seconds)) },
-            unitText = stringResource(R.string.minute),
-            range = 0..59
-        )
-        NumberInputSlot(
-            textFieldValue = seconds,
-            onValueChanged = { onValueChanged(getSeconds(hours, minutes, it)) },
-            unitText = stringResource(R.string.second),
-            range = 0..59
-        )
-    }
-}
-
-@Composable
-private fun DistanceTextSelector(
-    input: Int,
-    onValueChanged: (Int) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val kiloMeter = input / 1000
-    val meter = input % 1000
-    Column(
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.start_length_selector_padding_dp)),
-        modifier = modifier
-    ) {
-        NumberInputSlot(
-            textFieldValue = kiloMeter,
-            onValueChanged = { onValueChanged(it * 1000 + meter) },
-            unitText = stringResource(R.string.kilo_meter)
-        )
-        NumberInputSlot(
-            textFieldValue = meter,
-            onValueChanged = { onValueChanged(kiloMeter * 1000 + meter) },
-            unitText = stringResource(R.string.meter),
-            range = 0..999
-        )
-    }
-}
-
-private fun getSeconds(hours: Int, minutes: Int, seconds: Int) =
-    hours * 3600 + minutes * 60 + seconds
