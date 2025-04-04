@@ -22,6 +22,11 @@
     <string name="meter">m</string>
     <string name="time_input_dialog_title">시간 입력</string>
     <string name="distance_input_dialog_title">거리 입력</string>
+    <string name="pace_input_dialog_title">페이스 입력(1km 기준)</string>
     <string name="total_length">총 길이</string>
     <string name="start_play_setting_input_length">길이 입력</string>
+    <string name="start_play_setting_pace_interval">구간 %d</string>
+    <string name="start_play_setting_pace_interval_length">구간 길이</string>
+    <string name="start_play_setting_pace_interval_velocity">구간 속도</string>
+    <string name="start_play_setting_input_pace">페이스 입력</string>
 </resources>

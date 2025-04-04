@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -16,11 +17,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.simullim.R
 import com.simullim.compose.RoundedParkGreenBox
 import com.simullim.compose.ui.theme.DarkGrey
+import com.simullim.start.model.PaceSetting
 
 @Composable
 internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
     val playListModel = startViewModel.startPlayListStateFlow.collectAsStateWithLifecycle().value
-    val paceSettingModel = startViewModel.paceSettingStateFlow.collectAsStateWithLifecycle().value
+    val currentType = startViewModel.paceTypeStateFlow.collectAsStateWithLifecycle().value
+    val paceSettingModel =
+        startViewModel.currentPaceListStateFlow.collectAsStateWithLifecycle().value
     RoundedParkGreenBox(
         modifier = Modifier
             .fillMaxSize()
@@ -40,15 +44,32 @@ internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
             }
             item {
                 SelectTypeSection(
-                    type = paceSettingModel.selectedType,
+                    type = currentType,
                     onChecked = startViewModel::setPaceSettingType,
-                    length = paceSettingModel.currentModel.length,
-                    onLengthChanged = startViewModel::setTrackLength,
                     modifier = Modifier.padding(vertical = 16.dp)
                 )
             }
-            item {
-                StartScreenDivider()
+            var startAcc = 0
+            itemsIndexed(paceSettingModel.paceList) { index: Int, item: PaceSetting.Pace ->
+                PaceItem(
+                    type = currentType,
+                    index = index,
+                    start = startAcc,
+                    pace = item,
+                    onLengthChanged = { length ->
+                        startViewModel.updatePaceLength(
+                            idx = index,
+                            length = length
+                        )
+                    },
+                    onPaceChanged = { velocity ->
+                        startViewModel.updatePaceVelocity(
+                            idx = index,
+                            velocity = velocity
+                        )
+                    }
+                )
+                startAcc += item.length
             }
         }
     }

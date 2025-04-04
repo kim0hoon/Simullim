@@ -15,6 +15,10 @@ fun millsToMinSecString(mills: Long): String {
     return String.format(null, "%d:%02d", min, sec)
 }
 
+fun secToHourMinSecString(sec: Long): String = millsToHourMinSecString(sec * 1000)
+
+fun secToMinSecString(sec: Long): String = millsToMinSecString(sec * 1000)
+
 fun millsToSec(mills: Long) = TimeUnit.MILLISECONDS.toSeconds(mills)
 fun millsToMin(mills: Long) = TimeUnit.MILLISECONDS.toMinutes(mills)
 fun millsToHour(mills: Long) = TimeUnit.MILLISECONDS.toHours(mills)

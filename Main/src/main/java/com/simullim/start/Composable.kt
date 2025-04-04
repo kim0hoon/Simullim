@@ -5,11 +5,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.HorizontalDivider
@@ -17,7 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,11 +35,15 @@ import com.simullim.compose.RoundedParkGreenBox
 import com.simullim.compose.RoundedParkGreenButton
 import com.simullim.compose.ui.theme.GreyD4
 import com.simullim.compose.ui.theme.Typography
+import com.simullim.meterToKiloMeterMeterString
 import com.simullim.millsToHourMinSecString
 import com.simullim.millsToMinSecString
+import com.simullim.secToHourMinSecString
+import com.simullim.secToMinSecString
 import com.simullim.start.model.PaceSetting
 import com.simullim.start.model.StartPlayListModel
 
+//TODO pace clear, pace remove 추가
 @Composable
 internal fun StartScreenDivider(modifier: Modifier = Modifier) {
     HorizontalDivider(
@@ -53,7 +57,7 @@ internal fun StartTitle(title: String, modifier: Modifier = Modifier) {
     Text(
         text = title,
         color = Color.White,
-        style = Typography.titleLarge,
+        style = Typography.headlineMedium,
         maxLines = 2,
         overflow = TextOverflow.Ellipsis,
         modifier = modifier
@@ -175,27 +179,8 @@ internal fun PlaylistItem(
 internal fun SelectTypeSection(
     type: PaceSetting.Type,
     onChecked: (PaceSetting.Type) -> Unit,
-    length: Int,
-    onLengthChanged: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var showLengthInputDialog by rememberSaveable { mutableStateOf(false) }
-    if (showLengthInputDialog) {
-        when (type) {
-            PaceSetting.Type.Time -> TimeInputDialog(
-                onConfirm = {
-                    onLengthChanged(it)
-                    showLengthInputDialog = false
-                },
-                onDismiss = { showLengthInputDialog = false })
-            PaceSetting.Type.Distance -> DistanceInputDialog(
-                onConfirm = {
-                    onLengthChanged(it)
-                    showLengthInputDialog = false
-                },
-                onDismiss = { showLengthInputDialog = false })
-        }
-    }
     Column(modifier = modifier) {
         StartTitle(
             title = stringResource(R.string.start_play_setting_length_title),
@@ -215,62 +200,13 @@ internal fun SelectTypeSection(
                 modifier = Modifier.weight(1f)
             )
         }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(top = 16.dp)
-        ) {
-            val total = when (type) {
-                PaceSetting.Type.Distance -> length.toTotalDistanceString()
-                PaceSetting.Type.Time -> length.toTotalTimeString()
-            }
-            val totalLength = stringResource(R.string.total_length)
-            Text(
-                text = "$totalLength $total",
-                color = Color.White,
-                style = Typography.titleMedium
-            )
-//            Text(
-//                text = total,
-//                color = Color.LightGray,
-//                style = Typography.bodyLarge,
-//                textAlign = TextAlign.Center,
-//                modifier = Modifier.padding(start = 4.dp)
-//            )
-            Spacer(modifier.weight(1f))
-            RoundedParkGreenButton(
-                onClick = { showLengthInputDialog = true },
-                buttonText = stringResource(R.string.start_play_setting_input_length),
-            )
-        }
     }
-}
-
-private fun Int.toTotalDistanceString(): String {
-    if (this@toTotalDistanceString == 0) return "0m"
-    val km = this@toTotalDistanceString / 1000
-    val m = this@toTotalDistanceString % 1000
-    return buildList {
-        if (km != 0) add("${km}km")
-        if (m != 0) add("${m}m")
-    }.joinToString(separator = " ")
-}
-
-private fun Int.toTotalTimeString(): String {
-    if (this@toTotalTimeString == 0) return "0초"
-    val hour = this@toTotalTimeString / 3600
-    val min = (this@toTotalTimeString / 60) % 60
-    val sec = this@toTotalTimeString % 60
-    return buildList {
-        if (hour != 0) add("${hour}시간")
-        if (min != 0) add("${min}분")
-        if (sec != 0) add("${sec}초")
-    }.joinToString(separator = " ")
 }
 
 @Composable
 @Preview
 private fun SelectTypeSectionPreview() {
-    SelectTypeSection(type = PaceSetting.Type.Default, onChecked = {}, 0, {})
+    SelectTypeSection(type = PaceSetting.Type.Default, onChecked = {})
 }
 
 @Composable
@@ -336,12 +272,160 @@ internal fun DistanceInputDialog(
 }
 
 @Composable
-internal fun PaceItem(pace: PaceSetting.Pace) {
+internal fun PaceInputDialog(
+    onConfirm: (Int) -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val params = arrayOf(
+        NumberTextInputDialogParam(
+            toResult = { it * 60 },
+            text = stringResource(R.string.minute),
+            range = 0..59
+        ),
+        NumberTextInputDialogParam(
+            toResult = { it },
+            text = stringResource(R.string.second),
+            range = 0..59
+        )
+    )
+    NumberTextInputDialog(
+        title = stringResource(R.string.pace_input_dialog_title),
+        params = params,
+        confirmText = stringResource(R.string.confirm),
+        onConfirm = onConfirm,
+        cancelText = stringResource(R.string.cancel),
+        onCancel = onDismiss,
+        modifier = modifier
+    )
+}
 
+private enum class DialogType {
+    TimeInput,
+    DistanceInput,
+    PaceInput,
+    Nothing
+}
+
+@Composable
+internal fun PaceItem(
+    type: PaceSetting.Type,
+    index: Int,
+    start: Int,
+    pace: PaceSetting.Pace,
+    onLengthChanged: (Int) -> Unit,
+    onPaceChanged: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val toDisplayString = when (type) {
+        PaceSetting.Type.Time -> ::secToHourMinSecString
+        PaceSetting.Type.Distance -> ::meterToKiloMeterMeterString
+    }
+    var showInputDialog by remember { mutableStateOf(DialogType.Nothing) }
+    val onDismiss = { showInputDialog = DialogType.Nothing }
+
+    RoundedParkGreenBox(modifier = modifier) {
+        when (showInputDialog) {
+            DialogType.PaceInput -> PaceInputDialog(
+                onConfirm = onPaceChanged,
+                onDismiss = onDismiss
+            )
+            DialogType.TimeInput -> TimeInputDialog(
+                onConfirm = onLengthChanged,
+                onDismiss = onDismiss
+            )
+            DialogType.DistanceInput -> DistanceInputDialog(
+                onConfirm = onLengthChanged,
+                onDismiss = onDismiss
+            )
+            DialogType.Nothing -> {
+                //do nothing
+            }
+        }
+        Column(modifier = Modifier.padding(8.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 4.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.start_play_setting_pace_interval, index + 1),
+                    color = Color.White,
+                    style = Typography.titleLarge
+                )
+                Text(
+                    text = "(${toDisplayString(start.toLong())} ~ ${toDisplayString(start.toLong() + pace.length)})",
+                    color = Color.LightGray,
+                    style = Typography.bodyLarge,
+                    modifier = Modifier
+                        .padding(start = 4.dp)
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 4.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.start_play_setting_pace_interval_length),
+                    color = Color.White,
+                    style = Typography.titleMedium
+                )
+                Text(
+                    text = toDisplayString(pace.length.toLong()),
+                    style = Typography.bodyLarge,
+                    color = Color.LightGray,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 4.dp)
+                )
+                RoundedParkGreenButton(
+                    onClick = {
+                        showInputDialog = when (type) {
+                            PaceSetting.Type.Time -> DialogType.TimeInput
+                            PaceSetting.Type.Distance -> DialogType.DistanceInput
+                        }
+                    },
+                    buttonText = stringResource(R.string.start_play_setting_input_length),
+                    modifier = Modifier.width(120.dp)
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 4.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.start_play_setting_pace_interval_velocity),
+                    color = Color.White,
+                    style = Typography.titleMedium
+                )
+                Text(
+                    text = secToMinSecString(pace.length.toLong()) + "/km",
+                    style = Typography.bodyLarge,
+                    color = Color.LightGray,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 4.dp)
+                )
+                RoundedParkGreenButton(
+                    onClick = {
+                        showInputDialog = DialogType.PaceInput
+                    }, buttonText = stringResource(R.string.start_play_setting_input_pace),
+                    modifier = Modifier.width(120.dp)
+                )
+            }
+        }
+    }
 }
 
 @Composable
 @Preview
 private fun PaceItemPreview() {
-    PaceItem(pace = PaceSetting.Pace(10, 11, 12))
+    PaceItem(
+        type = PaceSetting.Type.Distance,
+        index = 12,
+        start = 10312,
+        pace = PaceSetting.Pace(0, 312),
+        onLengthChanged = {},
+        onPaceChanged = {},
+        modifier = Modifier.fillMaxWidth()
+    )
 }
