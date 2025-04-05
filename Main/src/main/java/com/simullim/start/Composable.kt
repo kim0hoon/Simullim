@@ -451,3 +451,61 @@ private fun PaceItemPreview() {
         modifier = Modifier.fillMaxWidth()
     )
 }
+
+@Composable
+internal fun PaceEmptyItem(modifier: Modifier = Modifier) {
+    Column(verticalArrangement = Arrangement.Center, modifier = modifier) {
+        Text(
+            text = stringResource(R.string.start_play_setting_pace_empty),
+            color = Color.White,
+            style = Typography.bodyLarge,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 24.dp, horizontal = 16.dp)
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun PaceEmptyItemPreview() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(120.dp)
+    ) {
+        PaceEmptyItem()
+    }
+}
+
+@Composable
+internal fun AddPaceButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    RoundedParkGreenButton(
+        onClick = onClick,
+        buttonText = stringResource(R.string.start_play_setting_pace_add),
+        modifier = modifier
+    )
+}
+
+@Composable
+@Preview
+private fun AddPaceButtonPreview() {
+    AddPaceButton({})
+}
+
+@Composable
+internal fun PlayButton(onClick: () -> Unit, isEnabled: Boolean, modifier: Modifier = Modifier) {
+    RoundedParkGreenButton(
+        onClick = onClick,
+        buttonText = stringResource(R.string.start),
+        isEnabled = isEnabled,
+        modifier = modifier
+    )
+}
+
+@Composable
+@Preview
+private fun PlayButtonPreview() {
+    PlayButton({}, true)
+}
