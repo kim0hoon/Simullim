@@ -332,15 +332,24 @@ internal fun PaceItem(
     RoundedParkGreenBox(modifier = modifier) {
         when (showInputDialog) {
             DialogType.PaceInput -> PaceInputDialog(
-                onConfirm = onPaceChanged,
+                onConfirm = {
+                    onPaceChanged(it)
+                    showInputDialog = DialogType.Nothing
+                },
                 onDismiss = onDismiss
             )
             DialogType.TimeInput -> TimeInputDialog(
-                onConfirm = onLengthChanged,
+                onConfirm = {
+                    onLengthChanged(it)
+                    showInputDialog = DialogType.Nothing
+                },
                 onDismiss = onDismiss
             )
             DialogType.DistanceInput -> DistanceInputDialog(
-                onConfirm = onLengthChanged,
+                onConfirm = {
+                    onLengthChanged(it)
+                    showInputDialog = DialogType.Nothing
+                },
                 onDismiss = onDismiss
             )
             DialogType.Nothing -> {
