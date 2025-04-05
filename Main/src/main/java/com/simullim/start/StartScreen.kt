@@ -67,7 +67,8 @@ internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
                             idx = index,
                             velocity = velocity
                         )
-                    }
+                    },
+                    onClickRemoved = { startViewModel.removePaceAt(idx = index) }
                 )
                 startAcc += item.length
             }
