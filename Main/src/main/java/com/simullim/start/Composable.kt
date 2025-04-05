@@ -425,7 +425,7 @@ internal fun PaceItem(
                         style = Typography.titleMedium
                     )
                     Text(
-                        text = secToMinSecString(pace.length.toLong()) + "/km",
+                        text = secToMinSecString(pace.velocitySecPerKiloMeter.toLong()) + "/km",
                         style = Typography.bodyLarge,
                         color = Color.LightGray,
                         modifier = Modifier
