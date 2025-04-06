@@ -28,8 +28,10 @@ private data class DistanceType(
     override val paceList: List<Pace> = emptyList()
 ) : PaceSetting() {
     override val type: Type = Type.Distance
-    override val totalDistanceMeter: Int = 0 //TODO 계산
-    override val totalTimeSec: Int = 0//TODO 계산
+    override val totalDistanceMeter: Int = paceList.sumOf { it.length }
+    override val totalTimeSec: Int =
+        paceList.sumOf { it.run { length * velocitySecPerKiloMeter } / 1000 }
+
     override fun withPaceList(paceList: List<Pace>) = this.copy(paceList = paceList)
 
 }
@@ -39,8 +41,9 @@ private data class TimeType(
     override val paceList: List<Pace> = emptyList()
 ) : PaceSetting() {
     override val type: Type = Type.Time
-    override val totalDistanceMeter: Int = 0//TODO 계산
-    override val totalTimeSec: Int = 0 //TODO 계산
+    override val totalDistanceMeter: Int =
+        paceList.sumOf { it.run { length * 1000 / velocitySecPerKiloMeter } }
+    override val totalTimeSec: Int = paceList.sumOf { it.length }
     override fun withPaceList(paceList: List<Pace>) = this.copy(paceList = paceList)
 }
 

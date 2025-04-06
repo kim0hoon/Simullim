@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,9 +37,8 @@ internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
                 .weight(1f)
         ) {
             LazyColumn(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-
-                ) {
+                contentPadding = PaddingValues(all = 16.dp),
+            ) {
                 item {
                     PlaylistSection(
                         model = playListModel, modifier = Modifier.padding(bottom = 16.dp),
@@ -64,6 +64,7 @@ internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
                 } else {
                     var startAcc = 0
                     itemsIndexed(paceSettingModel.paceList) { index: Int, item: PaceSetting.Pace ->
+                        if (index > 0) Spacer(modifier = Modifier.height(4.dp))
                         PaceItem(
                             type = currentType,
                             index = index,
@@ -81,7 +82,7 @@ internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
                                     velocity = velocity
                                 )
                             },
-                            onClickRemoved = { startViewModel.removePaceAt(idx = index) }
+                            onClickRemoved = { startViewModel.removePaceAt(idx = index) },
                         )
                         startAcc += item.length
                     }
@@ -91,6 +92,12 @@ internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
                         onClick = startViewModel::addNewPace,
                         modifier = Modifier.fillMaxWidth()
                     )
+                }
+                item {
+                    StartScreenDivider(modifier = Modifier.padding(vertical = 16.dp))
+                }
+                item {
+                    SummarySection(paceSetting = paceSettingModel)
                 }
             }
         }

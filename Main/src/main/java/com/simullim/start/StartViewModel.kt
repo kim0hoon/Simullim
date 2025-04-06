@@ -61,17 +61,19 @@ internal class StartViewModel : ViewModel() {
 
     fun updatePaceLength(idx: Int, length: Int) {
         val currentPaceList = currentPaceListStateFlow.value.paceList
-        currentPaceList.toMutableList().also {
+        val updated = currentPaceList.toMutableList().also {
             it.getOrNull(idx) ?: return
             it[idx] = it[idx].copy(length = length)
         }
+        updateCurrentPaceList(paceList = updated)
     }
 
     fun updatePaceVelocity(idx: Int, velocity: Int) {
         val currentPaceList = currentPaceListStateFlow.value.paceList
-        currentPaceList.toMutableList().also {
+        val updated = currentPaceList.toMutableList().also {
             it.getOrNull(idx) ?: return
             it[idx] = it[idx].copy(velocitySecPerKiloMeter = velocity)
         }
+        updateCurrentPaceList(paceList = updated)
     }
 }

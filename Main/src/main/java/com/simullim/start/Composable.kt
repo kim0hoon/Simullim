@@ -47,7 +47,6 @@ import com.simullim.secToMinSecString
 import com.simullim.start.model.PaceSetting
 import com.simullim.start.model.StartPlayListModel
 
-//TODO pace clear, pace remove 추가
 @Composable
 internal fun StartScreenDivider(modifier: Modifier = Modifier) {
     HorizontalDivider(
@@ -517,4 +516,50 @@ internal fun PlayButton(onClick: () -> Unit, isEnabled: Boolean, modifier: Modif
 @Preview
 private fun PlayButtonPreview() {
     PlayButton({}, true)
+}
+
+@Composable
+internal fun SummarySection(paceSetting: PaceSetting, modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
+        StartTitle(title = stringResource(R.string.start_play_summary))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(top = 8.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.start_play_summary_total_distance),
+                color = Color.White,
+                style = Typography.titleLarge,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = meterToKiloMeterMeterString(paceSetting.totalDistanceMeter.toLong()),
+                color = Color.LightGray,
+                style = Typography.bodyLarge,
+            )
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(top = 4.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.start_play_summary_total_time), color = Color.White,
+                style = Typography.titleLarge,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = millsToHourMinSecString(paceSetting.totalTimeSec.toLong()),
+                color = Color.LightGray,
+                style = Typography.bodyLarge,
+            )
+        }
+
+    }
+
+}
+
+@Composable
+@Preview
+private fun SummarySectionPreview() {
+    SummarySection(paceSetting = PaceSetting(PaceSetting.Type.Distance))
 }
