@@ -314,7 +314,6 @@ private enum class DialogType {
 internal fun PaceItem(
     type: PaceSetting.Type,
     index: Int,
-    start: Int,
     pace: PaceSetting.Pace,
     onLengthChanged: (Int) -> Unit,
     onPaceChanged: (Int) -> Unit,
@@ -367,7 +366,7 @@ internal fun PaceItem(
                         style = Typography.titleLarge,
                     )
                     Text(
-                        text = "${toDisplayString(start.toLong())} ~ ${toDisplayString(start.toLong() + pace.length)}",
+                        text = "${toDisplayString(pace.start.toLong())} ~ ${toDisplayString(pace.start.toLong() + pace.length)}",
                         color = Color.LightGray,
                         style = Typography.bodyLarge,
                     )
@@ -451,7 +450,6 @@ private fun PaceItemPreview() {
     PaceItem(
         type = PaceSetting.Type.Distance,
         index = 12,
-        start = 10312,
         pace = PaceSetting.Pace(0, 312),
         onLengthChanged = {},
         onPaceChanged = {},
@@ -548,7 +546,7 @@ internal fun SummarySection(paceSetting: PaceSetting, modifier: Modifier = Modif
                 modifier = Modifier.weight(1f)
             )
             Text(
-                text = millsToHourMinSecString(paceSetting.totalTimeSec.toLong()),
+                text = secToHourMinSecString(paceSetting.totalTimeSec.toLong()),
                 color = Color.LightGray,
                 style = Typography.bodyLarge,
             )

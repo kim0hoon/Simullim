@@ -20,7 +20,7 @@ internal abstract class PaceSetting {
         }
     }
 
-    data class Pace(val length: Int = 0, val velocitySecPerKiloMeter: Int = 0)
+    data class Pace(val start: Int = 0, val length: Int = 0, val velocitySecPerKiloMeter: Int = 0)
 }
 
 @Immutable
@@ -42,7 +42,7 @@ private data class TimeType(
 ) : PaceSetting() {
     override val type: Type = Type.Time
     override val totalDistanceMeter: Int =
-        paceList.sumOf { it.run { length * 1000 / velocitySecPerKiloMeter } }
+        paceList.sumOf { it.run { if (velocitySecPerKiloMeter == 0) 0 else length * 1000 / velocitySecPerKiloMeter } }
     override val totalTimeSec: Int = paceList.sumOf { it.length }
     override fun withPaceList(paceList: List<Pace>) = this.copy(paceList = paceList)
 }

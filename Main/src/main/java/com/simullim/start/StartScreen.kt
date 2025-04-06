@@ -62,13 +62,11 @@ internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
                         PaceEmptyItem(modifier = Modifier.fillMaxWidth())
                     }
                 } else {
-                    var startAcc = 0
                     itemsIndexed(paceSettingModel.paceList) { index: Int, item: PaceSetting.Pace ->
                         if (index > 0) Spacer(modifier = Modifier.height(4.dp))
                         PaceItem(
                             type = currentType,
                             index = index,
-                            start = startAcc,
                             pace = item,
                             onLengthChanged = { length ->
                                 startViewModel.updatePaceLength(
@@ -84,7 +82,6 @@ internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
                             },
                             onClickRemoved = { startViewModel.removePaceAt(idx = index) },
                         )
-                        startAcc += item.length
                     }
                 }
                 item {

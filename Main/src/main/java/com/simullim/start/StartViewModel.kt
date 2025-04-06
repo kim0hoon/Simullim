@@ -47,15 +47,26 @@ internal class StartViewModel : ViewModel() {
         }
     }
 
+    private fun getUpdatedStart(old: List<PaceSetting.Pace>): List<PaceSetting.Pace> {
+        var acc = 0
+        return old.map {
+            it.copy(start = acc).also { model ->
+                acc += model.length
+            }
+        }
+    }
+
     fun addNewPace() {
         val currentPaceList = currentPaceListStateFlow.value.paceList
-        updateCurrentPaceList(currentPaceList + PaceSetting.Pace())
+        val start = currentPaceList.lastOrNull()?.run { start + length } ?: 0
+        updateCurrentPaceList(currentPaceList + PaceSetting.Pace(start = start))
     }
 
     fun removePaceAt(idx: Int) {
         val currentPaceList = currentPaceListStateFlow.value.paceList
         val target = currentPaceList.getOrNull(idx) ?: return
-        updateCurrentPaceList(currentPaceList - target)
+        val updated = getUpdatedStart(old = currentPaceList - target)
+        updateCurrentPaceList(updated)
 
     }
 
@@ -65,7 +76,7 @@ internal class StartViewModel : ViewModel() {
             it.getOrNull(idx) ?: return
             it[idx] = it[idx].copy(length = length)
         }
-        updateCurrentPaceList(paceList = updated)
+        updateCurrentPaceList(paceList = getUpdatedStart(old = updated))
     }
 
     fun updatePaceVelocity(idx: Int, velocity: Int) {
@@ -74,6 +85,6 @@ internal class StartViewModel : ViewModel() {
             it.getOrNull(idx) ?: return
             it[idx] = it[idx].copy(velocitySecPerKiloMeter = velocity)
         }
-        updateCurrentPaceList(paceList = updated)
+        updateCurrentPaceList(paceList = getUpdatedStart(old = updated))
     }
 }
