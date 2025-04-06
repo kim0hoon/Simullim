@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,8 +28,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -71,6 +76,33 @@ fun RoundedParkGreenButton(
 }
 
 @Composable
+fun CheckableRoundedParkGreenButton(
+    onClick: () -> Unit,
+    buttonText: String,
+    modifier: Modifier = Modifier,
+    isChecked: Boolean = true,
+    innerPaddingHorizontal: Dp = 0.dp,
+    innerPaddingVertical: Dp = 0.dp
+) {
+    val color = if (isChecked) ParkGreen else Grey81
+    OutlinedButton(
+        onClick = onClick, modifier = modifier,
+        shape = RoundedCornerShape(10.dp),
+        border = BorderStroke(2.dp, color),
+    ) {
+        Text(
+            text = buttonText,
+            textAlign = TextAlign.Center,
+            color = color,
+            modifier = Modifier.padding(
+                horizontal = innerPaddingHorizontal,
+                vertical = innerPaddingVertical
+            )
+        )
+    }
+}
+
+@Composable
 @Preview(showBackground = true)
 private fun RoundedParkGreenButtonPreview() {
     Column(Modifier.background(Color.DarkGray)) {
@@ -87,12 +119,13 @@ fun RoundedParkGreenBox(
     boxScope: @Composable BoxScope.() -> Unit
 ) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .border(
                 width = width,
                 color = ParkGreen,
                 shape = RoundedCornerShape(radius)
             )
+            .then(modifier)
     ) {
         boxScope()
     }
@@ -251,4 +284,36 @@ fun CommonHeaderPreview() {
             rightIcon = CommonHeaderIcon(R.drawable.baseline_arrow_back_ios_new_24, {})
         )
     }
+}
+
+@Composable
+fun NumberTextField(
+    value: Int,
+    onValueChanged: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = Typography.bodyLarge,
+    range: IntRange = Int.MIN_VALUE..Int.MAX_VALUE
+) {
+    RoundedParkGreenBox(modifier = modifier) {
+        BasicTextField(
+            value = value.toString(),
+            onValueChange = {
+                onValueChanged((it.toIntOrNull() ?: 0).coerceIn(range))
+            },
+            textStyle = textStyle.copy(color = Color.White, textAlign = TextAlign.Center),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+            cursorBrush = SolidColor(Color.White),
+            modifier = Modifier
+                .align(Alignment.Center)
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp, vertical = 8.dp)
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun NumberTextFieldPreview() {
+    NumberTextField(value = 123, {}, modifier = Modifier.height(48.dp))
 }

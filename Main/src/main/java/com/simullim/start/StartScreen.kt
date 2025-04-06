@@ -1,33 +1,127 @@
 package com.simullim.start
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.simullim.MainEvent
-import com.simullim.MainViewModel
+import com.example.simullim.R
+import com.simullim.compose.RoundedParkGreenBox
+import com.simullim.compose.ui.theme.DarkGrey
+import com.simullim.start.model.PaceSetting
 
 @Composable
-internal fun StartScreen(mainViewModel: MainViewModel = viewModel()) {
-    Column {
-        Text(
-            text = "add playlist",
-            color = Color.White,
-            fontSize = 32.sp,
-            modifier = Modifier.clickable {
-                mainViewModel.sendMainEvent(MainEvent.SET_PLAYLIST)
-            })
+internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
+    val playListModel = startViewModel.startPlayListStateFlow.collectAsStateWithLifecycle().value
+    val currentType = startViewModel.paceTypeStateFlow.collectAsStateWithLifecycle().value
+    val paceSettingModel =
+        startViewModel.currentPaceListStateFlow.collectAsStateWithLifecycle().value
+    Column(
+        modifier = Modifier.padding(dimensionResource(R.dimen.screen_padding_dp))
+    ) {
+        RoundedParkGreenBox(
+            modifier = Modifier
+                .weight(1f)
+        ) {
+            LazyColumn(
+                contentPadding = PaddingValues(all = 16.dp),
+            ) {
+                item {
+                    PlaylistSection(
+                        model = playListModel, modifier = Modifier.padding(bottom = 16.dp),
+                        onClick = {
+                            //TODO onClick
+                        }
+                    )
+                }
+                item {
+                    StartScreenDivider()
+                }
+                item {
+                    SelectTypeSection(
+                        type = currentType,
+                        onChecked = startViewModel::setPaceSettingType,
+                        modifier = Modifier.padding(vertical = 16.dp)
+                    )
+                }
+                if (paceSettingModel.paceList.isEmpty()) {
+                    item {
+                        PaceEmptyItem(modifier = Modifier.fillMaxWidth())
+                    }
+                } else {
+                    itemsIndexed(paceSettingModel.paceList) { index: Int, item: PaceSetting.Pace ->
+                        if (index > 0) Spacer(modifier = Modifier.height(4.dp))
+                        PaceItem(
+                            type = currentType,
+                            index = index,
+                            pace = item,
+                            onLengthChanged = { length ->
+                                startViewModel.updatePaceLength(
+                                    idx = index,
+                                    length = length
+                                )
+                            },
+                            onPaceChanged = { velocity ->
+                                startViewModel.updatePaceVelocity(
+                                    idx = index,
+                                    velocity = velocity
+                                )
+                            },
+                            onClickRemoved = { startViewModel.removePaceAt(idx = index) },
+                        )
+                    }
+                }
+                item {
+                    AddPaceButton(
+                        onClick = startViewModel::addNewPace,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                item {
+                    StartScreenDivider(modifier = Modifier.padding(vertical = 16.dp))
+                }
+                item {
+                    SummarySection(paceSetting = paceSettingModel)
+                }
+            }
+        }
 
-        Text(
-            text = "gps tracking",
-            color = Color.White,
-            fontSize = 32.sp,
-            modifier = Modifier.clickable {
-                mainViewModel.sendMainEvent(MainEvent.PLAY)
-            })
+        PlayButton(
+            onClick = {
+                //TODO onClick
+            },
+            isEnabled = playListModel.playlist.isNotEmpty() && paceSettingModel.paceList.isNotEmpty(),
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .fillMaxWidth()
+                .height(48.dp)
+
+        )
+    }
+
+}
+
+@Composable
+@Preview
+private fun StartScreenPreview() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = DarkGrey)
+    ) {
+        StartScreen()
     }
 }
