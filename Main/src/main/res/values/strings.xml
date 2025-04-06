@@ -32,4 +32,7 @@
     <string name="start_play_setting_pace_empty">추가버튼을 눌러\n구간별 페이스를 설정해주세요</string>
     <string name="start_play_setting_pace_add">구간 추가</string>
     <string name="start_play">시작</string>
+    <string name="start_play_summary">요약</string>
+    <string name="start_play_summary_total_distance">총 거리</string>
+    <string name="start_play_summary_total_time">총 시간</string>
 </resources>
