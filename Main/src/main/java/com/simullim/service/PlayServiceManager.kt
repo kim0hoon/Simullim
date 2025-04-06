@@ -18,11 +18,13 @@ internal class PlayServiceManager(
     private val onGpsDataEmitted: (GpsDataModel) -> Unit,
     private val onErrorEvent: (GpsTrackError) -> Unit
 ) : DefaultLifecycleObserver {
-    private val playServiceConnection = PlayServiceConnection()
-    private val service get() = playServiceConnection.service
+    private val playServiceConnection = PlayServiceConnection(onConnected = { isBound = true },
+        onDisConnected = { isBound = false })
+    private val service get() = playServiceConnection.service.takeIf { isBound }
     private val intent by lazy {
         Intent(context, PlayService::class.java)
     }
+    private var isBound: Boolean = false
 
     init {
         lifecycleOwner.lifecycle.addObserver(this)
@@ -77,5 +79,6 @@ internal class PlayServiceManager(
 
     private fun unbindService() {
         context.unbindService(playServiceConnection)
+        isBound = false
     }
 }
