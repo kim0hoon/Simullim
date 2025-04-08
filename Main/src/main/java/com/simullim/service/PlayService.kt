@@ -17,6 +17,7 @@ internal class PlayService : Service() {
     private val gpsTracker by lazy {
         GpsTracker(this)
     }
+    private val binder = PlayServiceBinder()
 
     val gpsDataStateFlow get() = gpsTracker.gpsDataStateFlow
     val errorEventFlow get() = gpsTracker.errorEventFlow
@@ -39,7 +40,7 @@ internal class PlayService : Service() {
         notificationManager.createNotificationChannel(notificationChannel)
     }
 
-    override fun onBind(intent: Intent?): IBinder = PlayServiceBinder()
+    override fun onBind(intent: Intent?): IBinder = binder
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         return START_STICKY
