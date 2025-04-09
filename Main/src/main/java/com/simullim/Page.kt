@@ -2,5 +2,6 @@ package com.simullim
 
 internal enum class Page {
     MAIN,
-    START
+    START,
+    PLAY_INFO
 }

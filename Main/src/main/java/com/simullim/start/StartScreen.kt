@@ -19,12 +19,18 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.simullim.R
+import com.simullim.MainEvent
+import com.simullim.MainViewModel
 import com.simullim.compose.RoundedParkGreenBox
 import com.simullim.compose.ui.theme.DarkGrey
 import com.simullim.start.model.PaceSetting
 
 @Composable
-internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
+internal fun StartScreen(
+    mainViewModel: MainViewModel = viewModel(),
+    startViewModel: StartViewModel = viewModel(),
+    onClickStart: () -> Unit
+) {
     val playListModel = startViewModel.startPlayListStateFlow.collectAsStateWithLifecycle().value
     val currentType = startViewModel.paceTypeStateFlow.collectAsStateWithLifecycle().value
     val paceSettingModel =
@@ -43,7 +49,7 @@ internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
                     PlaylistSection(
                         model = playListModel, modifier = Modifier.padding(bottom = 16.dp),
                         onClick = {
-                            //TODO onClick
+                            mainViewModel.sendMainEvent(MainEvent.SET_PLAYLIST)
                         }
                     )
                 }
@@ -100,9 +106,7 @@ internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
         }
 
         PlayButton(
-            onClick = {
-                //TODO onClick
-            },
+            onClick = onClickStart,
             isEnabled = playListModel.playlist.isNotEmpty() && paceSettingModel.paceList.isNotEmpty(),
             modifier = Modifier
                 .padding(top = 8.dp)
@@ -122,6 +126,6 @@ private fun StartScreenPreview() {
             .fillMaxSize()
             .background(color = DarkGrey)
     ) {
-        StartScreen()
+        StartScreen(onClickStart = {})
     }
 }
