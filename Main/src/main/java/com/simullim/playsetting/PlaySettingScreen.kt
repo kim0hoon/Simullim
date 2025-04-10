@@ -1,4 +1,4 @@
-package com.simullim.start
+package com.simullim.playsetting
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -14,24 +14,42 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.simullim.R
+import com.simullim.MainEvent
+import com.simullim.MainViewModel
+import com.simullim.compose.CommonHeader
+import com.simullim.compose.CommonHeaderIcon
 import com.simullim.compose.RoundedParkGreenBox
 import com.simullim.compose.ui.theme.DarkGrey
-import com.simullim.start.model.PaceSetting
+import com.simullim.playsetting.model.PaceSetting
 
 @Composable
-internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
-    val playListModel = startViewModel.startPlayListStateFlow.collectAsStateWithLifecycle().value
-    val currentType = startViewModel.paceTypeStateFlow.collectAsStateWithLifecycle().value
+internal fun PlaySettingScreen(
+    mainViewModel: MainViewModel = viewModel(),
+    playSettingViewModel: PlaySettingViewModel = viewModel(),
+    onClickStart: () -> Unit,
+    onClickBack: () -> Unit
+) {
+    val playListModel = playSettingViewModel.playListStateFlow.collectAsStateWithLifecycle().value
+    val currentType = playSettingViewModel.paceTypeStateFlow.collectAsStateWithLifecycle().value
     val paceSettingModel =
-        startViewModel.currentPaceListStateFlow.collectAsStateWithLifecycle().value
+        playSettingViewModel.currentPaceListStateFlow.collectAsStateWithLifecycle().value
     Column(
         modifier = Modifier.padding(dimensionResource(R.dimen.screen_padding_dp))
     ) {
+        CommonHeader(
+            title = stringResource(R.string.play_setting_title),
+            modifier = Modifier.fillMaxWidth(),
+            leftIcon = CommonHeaderIcon(
+                drawableRes = com.example.common.R.drawable.baseline_arrow_back_ios_new_24,
+                onClick = onClickBack
+            )
+        )
         RoundedParkGreenBox(
             modifier = Modifier
                 .weight(1f)
@@ -43,17 +61,17 @@ internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
                     PlaylistSection(
                         model = playListModel, modifier = Modifier.padding(bottom = 16.dp),
                         onClick = {
-                            //TODO onClick
+                            mainViewModel.sendMainEvent(MainEvent.SET_PLAYLIST)
                         }
                     )
                 }
                 item {
-                    StartScreenDivider()
+                    PlaySettingScreenDivider()
                 }
                 item {
                     SelectTypeSection(
                         type = currentType,
-                        onChecked = startViewModel::setPaceSettingType,
+                        onChecked = playSettingViewModel::setPaceSettingType,
                         modifier = Modifier.padding(vertical = 16.dp)
                     )
                 }
@@ -69,29 +87,29 @@ internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
                             index = index,
                             pace = item,
                             onLengthChanged = { length ->
-                                startViewModel.updatePaceLength(
+                                playSettingViewModel.updatePaceLength(
                                     idx = index,
                                     length = length
                                 )
                             },
                             onPaceChanged = { velocity ->
-                                startViewModel.updatePaceVelocity(
+                                playSettingViewModel.updatePaceVelocity(
                                     idx = index,
                                     velocity = velocity
                                 )
                             },
-                            onClickRemoved = { startViewModel.removePaceAt(idx = index) },
+                            onClickRemoved = { playSettingViewModel.removePaceAt(idx = index) },
                         )
                     }
                 }
                 item {
                     AddPaceButton(
-                        onClick = startViewModel::addNewPace,
+                        onClick = playSettingViewModel::addNewPace,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
                 item {
-                    StartScreenDivider(modifier = Modifier.padding(vertical = 16.dp))
+                    PlaySettingScreenDivider(modifier = Modifier.padding(vertical = 16.dp))
                 }
                 item {
                     SummarySection(paceSetting = paceSettingModel)
@@ -100,9 +118,7 @@ internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
         }
 
         PlayButton(
-            onClick = {
-                //TODO onClick
-            },
+            onClick = onClickStart,
             isEnabled = playListModel.playlist.isNotEmpty() && paceSettingModel.paceList.isNotEmpty(),
             modifier = Modifier
                 .padding(top = 8.dp)
@@ -116,12 +132,12 @@ internal fun StartScreen(startViewModel: StartViewModel = viewModel()) {
 
 @Composable
 @Preview
-private fun StartScreenPreview() {
+private fun PlaySettingScreenPreview() {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(color = DarkGrey)
     ) {
-        StartScreen()
+        PlaySettingScreen(onClickStart = {}, onClickBack = {})
     }
 }

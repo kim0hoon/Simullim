@@ -1,7 +1,7 @@
-package com.simullim.start.model
+package com.simullim.playsetting.model
 
 import androidx.compose.runtime.Immutable
-import com.simullim.start.model.PaceSetting.Type
+import com.simullim.playsetting.model.PaceSetting.Type
 
 
 internal abstract class PaceSetting {

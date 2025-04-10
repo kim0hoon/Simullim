@@ -1,9 +1,9 @@
-package com.simullim.start
+package com.simullim.playsetting
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simullim.start.model.PaceSetting
-import com.simullim.start.model.StartPlayListModel
+import com.simullim.playsetting.model.PaceSetting
+import com.simullim.playsetting.model.PlaySettingPlaylistModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,9 +11,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
-internal class StartViewModel : ViewModel() {
-    private val _startPlayListStateFlow = MutableStateFlow(StartPlayListModel())
-    val startPlayListStateFlow = _startPlayListStateFlow.asStateFlow()
+internal class PlaySettingViewModel : ViewModel() {
+    private val _playListStateFlow = MutableStateFlow(PlaySettingPlaylistModel())
+    val playListStateFlow = _playListStateFlow.asStateFlow()
 
     private val _paceTypeStateFlow = MutableStateFlow(PaceSetting.Type.Default)
     val paceTypeStateFlow = _paceTypeStateFlow.asStateFlow()
@@ -29,8 +29,8 @@ internal class StartViewModel : ViewModel() {
         PaceSetting(paceTypeStateFlow.value)
     )
 
-    fun setPlaylist(playlist: List<StartPlayListModel.Playlist>) {
-        _startPlayListStateFlow.value = StartPlayListModel(playlist = playlist)
+    fun setPlaylist(playlist: List<PlaySettingPlaylistModel.Playlist>) {
+        _playListStateFlow.value = PlaySettingPlaylistModel(playlist = playlist)
     }
 
     fun setPaceSettingType(type: PaceSetting.Type) {

@@ -24,18 +24,28 @@ import com.simullim.compose.TwoButtonDialog
 import com.simullim.compose.ui.theme.DarkGrey
 import com.simullim.compose.ui.theme.SimullimTheme
 import com.simullim.main.MainScreen
+import com.simullim.playinfo.PlayInfoScreen
 import com.simullim.playinfo.PlayInfoViewModel
+import com.simullim.playsetting.PlaySettingScreen
+import com.simullim.playsetting.PlaySettingViewModel
+import com.simullim.playsetting.model.PlaySettingPlaylistModel
 import com.simullim.service.PlayServiceManager
-import com.simullim.start.StartScreen
 import timber.log.Timber
 
 internal class MainActivity : FragmentActivity(), MainEventReceiver {
     private val mainViewModel by viewModels<MainViewModel>()
+    private val playSettingViewModel by viewModels<PlaySettingViewModel>()
     private val playInfoViewModel by viewModels<PlayInfoViewModel>()
 
     private val playlistResult = registerForActivityResult(MusicPickerResultContract()) {
-        //TODO playitem
-        Timber.d("playlist : $it")
+        val playlistModel = it?.map { musicModel ->
+            PlaySettingPlaylistModel.Playlist(
+                title = musicModel.title,
+                durationMills = musicModel.durationMillis ?: 0,
+                url = musicModel.uriString
+            )
+        } ?: emptyList()
+        playSettingViewModel.setPlaylist(playlistModel)
     }
     private val playServiceManager = PlayServiceManager(
         lifecycleOwner = this,
@@ -78,12 +88,20 @@ internal class MainActivity : FragmentActivity(), MainEventReceiver {
                 ) {
                     composable(route = Page.MAIN.name) {
                         MainScreen(
-                            onClickStart = { navController.navigate(Page.START.name) },
+                            onClickStart = { navController.navigate(Page.PLAY_SETTING.name) },
                             onClickQuit = { showQuitDialog = true })
                     }
 
-                    composable(route = Page.START.name) {
-                        StartScreen()
+                    composable(route = Page.PLAY_SETTING.name) {
+                        PlaySettingScreen(
+                            mainViewModel = mainViewModel,
+                            playSettingViewModel = playSettingViewModel,
+                            onClickStart = { navController.navigate(Page.PLAY_INFO.name) },
+                            onClickBack = navController::popBackStack
+                        )
+                    }
+                    composable(route = Page.PLAY_INFO.name) {
+                        PlayInfoScreen(playInfoViewModel = playInfoViewModel)
                     }
                 }
                 if (showQuitDialog) {
