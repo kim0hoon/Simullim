@@ -35,4 +35,5 @@
     <string name="start_play_summary">요약</string>
     <string name="start_play_summary_total_distance">총 거리</string>
     <string name="start_play_summary_total_time">총 시간</string>
+    <string name="play_setting_title">플레이 설정</string>
 </resources>

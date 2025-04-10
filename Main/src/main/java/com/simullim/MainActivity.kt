@@ -96,8 +96,9 @@ internal class MainActivity : FragmentActivity(), MainEventReceiver {
                         StartScreen(
                             mainViewModel = mainViewModel,
                             startViewModel = startViewModel,
-                            onClickStart = { navController.navigate(Page.PLAY_INFO.name) })
-
+                            onClickStart = { navController.navigate(Page.PLAY_INFO.name) },
+                            onClickBack = navController::popBackStack
+                        )
                     }
                     composable(route = Page.PLAY_INFO.name) {
                         PlayInfoScreen(playInfoViewModel = playInfoViewModel)

@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -21,6 +22,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.simullim.R
 import com.simullim.MainEvent
 import com.simullim.MainViewModel
+import com.simullim.compose.CommonHeader
+import com.simullim.compose.CommonHeaderIcon
 import com.simullim.compose.RoundedParkGreenBox
 import com.simullim.compose.ui.theme.DarkGrey
 import com.simullim.start.model.PaceSetting
@@ -29,7 +32,8 @@ import com.simullim.start.model.PaceSetting
 internal fun StartScreen(
     mainViewModel: MainViewModel = viewModel(),
     startViewModel: StartViewModel = viewModel(),
-    onClickStart: () -> Unit
+    onClickStart: () -> Unit,
+    onClickBack: () -> Unit
 ) {
     val playListModel = startViewModel.startPlayListStateFlow.collectAsStateWithLifecycle().value
     val currentType = startViewModel.paceTypeStateFlow.collectAsStateWithLifecycle().value
@@ -38,6 +42,14 @@ internal fun StartScreen(
     Column(
         modifier = Modifier.padding(dimensionResource(R.dimen.screen_padding_dp))
     ) {
+        CommonHeader(
+            title = stringResource(R.string.play_setting_title),
+            modifier = Modifier.fillMaxWidth(),
+            leftIcon = CommonHeaderIcon(
+                drawableRes = com.example.common.R.drawable.baseline_arrow_back_ios_new_24,
+                onClick = onClickBack
+            )
+        )
         RoundedParkGreenBox(
             modifier = Modifier
                 .weight(1f)
@@ -126,6 +138,6 @@ private fun StartScreenPreview() {
             .fillMaxSize()
             .background(color = DarkGrey)
     ) {
-        StartScreen(onClickStart = {})
+        StartScreen(onClickStart = {}, onClickBack = {})
     }
 }
