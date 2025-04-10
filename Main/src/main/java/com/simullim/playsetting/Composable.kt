@@ -1,4 +1,4 @@
-package com.simullim.start
+package com.simullim.playsetting
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -42,13 +42,13 @@ import com.simullim.compose.ui.theme.Typography
 import com.simullim.meterToKiloMeterMeterString
 import com.simullim.millsToHourMinSecString
 import com.simullim.millsToMinSecString
+import com.simullim.playsetting.model.PaceSetting
+import com.simullim.playsetting.model.PlaySettingPlaylistModel
 import com.simullim.secToHourMinSecString
 import com.simullim.secToMinSecString
-import com.simullim.start.model.PaceSetting
-import com.simullim.start.model.StartPlayListModel
 
 @Composable
-internal fun StartScreenDivider(modifier: Modifier = Modifier) {
+internal fun PlaySettingScreenDivider(modifier: Modifier = Modifier) {
     HorizontalDivider(
         modifier = modifier,
         color = Color.White
@@ -56,7 +56,7 @@ internal fun StartScreenDivider(modifier: Modifier = Modifier) {
 }
 
 @Composable
-internal fun StartTitle(title: String, modifier: Modifier = Modifier) {
+internal fun PlaySettingTitle(title: String, modifier: Modifier = Modifier) {
     Text(
         text = title,
         color = Color.White,
@@ -69,19 +69,19 @@ internal fun StartTitle(title: String, modifier: Modifier = Modifier) {
 
 @Composable
 @Preview
-private fun StartTitlePreview() {
-    StartTitle("test title 12312312312312398712938712893")
+private fun PlaySettingTitlePreview() {
+    PlaySettingTitle("test title 12312312312312398712938712893")
 }
 
 @Composable
 internal fun PlaylistSection(
-    model: StartPlayListModel,
+    model: PlaySettingPlaylistModel,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        StartTitle(
-            title = stringResource(R.string.start_playlist_title),
+        PlaySettingTitle(
+            title = stringResource(R.string.play_setting_playlist_title),
             modifier = Modifier.padding(bottom = 8.dp)
         )
         RoundedParkGreenBox(
@@ -104,7 +104,7 @@ internal fun PlaylistSection(
         }
         Text(
             text = stringResource(
-                R.string.start_playlist_total_duration,
+                R.string.play_setting_playlist_total_duration,
                 millsToHourMinSecString(model.totalDurationMills)
             ),
             color = GreyD4,
@@ -116,7 +116,7 @@ internal fun PlaylistSection(
         )
         RoundedParkGreenButton(
             onClick = onClick,
-            buttonText = stringResource(R.string.start_playlist_select),
+            buttonText = stringResource(R.string.play_setting_playlist_select),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp)
@@ -128,7 +128,7 @@ internal fun PlaylistSection(
 internal fun PlaylistEmptyItem(modifier: Modifier = Modifier) {
     Box(modifier = modifier) {
         Text(
-            text = stringResource(R.string.start_playlist_empty),
+            text = stringResource(R.string.play_setting_playlist_empty),
             textAlign = TextAlign.Center,
             modifier = Modifier.align(Alignment.Center),
             color = Color.White,
@@ -140,8 +140,8 @@ internal fun PlaylistEmptyItem(modifier: Modifier = Modifier) {
 @Composable
 @Preview
 private fun PlaylistSectionPreview() {
-    PlaylistSection(model = StartPlayListModel(List(30) {
-        StartPlayListModel.Playlist(
+    PlaylistSection(model = PlaySettingPlaylistModel(List(30) {
+        PlaySettingPlaylistModel.Playlist(
             title = "title $it",
             durationMills = it.toLong() * 1000,
             url = ""
@@ -152,12 +152,12 @@ private fun PlaylistSectionPreview() {
 @Composable
 @Preview
 private fun PlaylistSectionEmptyPreview() {
-    PlaylistSection(model = StartPlayListModel(), onClick = {})
+    PlaylistSection(model = PlaySettingPlaylistModel(), onClick = {})
 }
 
 @Composable
 internal fun PlaylistItem(
-    playlistModel: StartPlayListModel.Playlist,
+    playlistModel: PlaySettingPlaylistModel.Playlist,
     modifier: Modifier = Modifier
 ) {
     RoundedParkGreenBox(modifier = modifier) {
@@ -185,20 +185,20 @@ internal fun SelectTypeSection(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        StartTitle(
-            title = stringResource(R.string.start_play_setting_length_title),
+        PlaySettingTitle(
+            title = stringResource(R.string.play_setting_length_title),
             modifier = Modifier.padding(bottom = 8.dp)
         )
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             CheckableRoundedParkGreenButton(
                 onClick = { onChecked(PaceSetting.Type.Distance) },
-                buttonText = stringResource(R.string.start_play_setting_type_distance),
+                buttonText = stringResource(R.string.play_setting_type_distance),
                 isChecked = type == PaceSetting.Type.Distance,
                 modifier = Modifier.weight(1f)
             )
             CheckableRoundedParkGreenButton(
                 onClick = { onChecked(PaceSetting.Type.Time) },
-                buttonText = stringResource(R.string.start_play_setting_type_time),
+                buttonText = stringResource(R.string.play_setting_type_time),
                 isChecked = type == PaceSetting.Type.Time,
                 modifier = Modifier.weight(1f)
             )
@@ -361,7 +361,7 @@ internal fun PaceItem(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = stringResource(R.string.start_play_setting_pace_interval, index + 1),
+                        text = stringResource(R.string.play_setting_pace_interval, index + 1),
                         color = Color.White,
                         style = Typography.titleLarge,
                     )
@@ -387,7 +387,7 @@ internal fun PaceItem(
                     modifier = Modifier.padding(top = 4.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.start_play_setting_pace_interval_length),
+                        text = stringResource(R.string.play_setting_pace_interval_length),
                         color = Color.White,
                         style = Typography.titleMedium
                     )
@@ -418,7 +418,7 @@ internal fun PaceItem(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = stringResource(R.string.start_play_setting_pace_interval_velocity),
+                        text = stringResource(R.string.play_setting_pace_interval_velocity),
                         color = Color.White,
                         style = Typography.titleMedium
                     )
@@ -462,7 +462,7 @@ private fun PaceItemPreview() {
 internal fun PaceEmptyItem(modifier: Modifier = Modifier) {
     Column(verticalArrangement = Arrangement.Center, modifier = modifier) {
         Text(
-            text = stringResource(R.string.start_play_setting_pace_empty),
+            text = stringResource(R.string.play_setting_pace_empty),
             color = Color.White,
             style = Typography.bodyLarge,
             textAlign = TextAlign.Center,
@@ -489,7 +489,7 @@ private fun PaceEmptyItemPreview() {
 internal fun AddPaceButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     RoundedParkGreenButton(
         onClick = onClick,
-        buttonText = stringResource(R.string.start_play_setting_pace_add),
+        buttonText = stringResource(R.string.play_setting_pace_add),
         modifier = modifier
     )
 }
@@ -519,13 +519,13 @@ private fun PlayButtonPreview() {
 @Composable
 internal fun SummarySection(paceSetting: PaceSetting, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
-        StartTitle(title = stringResource(R.string.start_play_summary))
+        PlaySettingTitle(title = stringResource(R.string.play_setting_summary))
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(top = 8.dp)
         ) {
             Text(
-                text = stringResource(R.string.start_play_summary_total_distance),
+                text = stringResource(R.string.play_setting_summary_total_distance),
                 color = Color.White,
                 style = Typography.titleLarge,
                 modifier = Modifier.weight(1f)
@@ -541,7 +541,8 @@ internal fun SummarySection(paceSetting: PaceSetting, modifier: Modifier = Modif
             modifier = Modifier.padding(top = 4.dp)
         ) {
             Text(
-                text = stringResource(R.string.start_play_summary_total_time), color = Color.White,
+                text = stringResource(R.string.play_setting_summary_total_time),
+                color = Color.White,
                 style = Typography.titleLarge,
                 modifier = Modifier.weight(1f)
             )

@@ -1,9 +1,9 @@
-package com.simullim.start.model
+package com.simullim.playsetting.model
 
 import androidx.compose.runtime.Immutable
 
 @Immutable
-internal data class StartPlayListModel(
+internal data class PlaySettingPlaylistModel(
     val playlist: List<Playlist> = emptyList()
 ) {
     val totalDurationMills = playlist.sumOf { it.durationMills }
