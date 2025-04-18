@@ -2,6 +2,7 @@ package com.simullim.playinfo
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -133,6 +134,7 @@ internal fun TrackProgressSection(playInfoTrack: PlayInfoTrack, modifier: Modifi
                 .fillMaxWidth()
                 .padding(top = 4.dp)
         )
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(top = 4.dp)
@@ -147,6 +149,7 @@ internal fun TrackProgressSection(playInfoTrack: PlayInfoTrack, modifier: Modifi
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 8.dp)
+                    .basicMarquee(iterations = Int.MAX_VALUE)
 
             )
             Text(
