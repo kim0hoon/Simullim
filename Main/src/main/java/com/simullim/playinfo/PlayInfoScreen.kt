@@ -70,7 +70,7 @@ internal fun PlayInfoScreen(
             }
         }
         //TODO onClick
-        ControllerSection(playStatus = playStatus, {}, {}, modifier = Modifier.padding(top = 16.dp))
+        ControllerSection(playStatus = playStatus, {}, {}, modifier = Modifier.padding(top = 8.dp))
     }
 
 
