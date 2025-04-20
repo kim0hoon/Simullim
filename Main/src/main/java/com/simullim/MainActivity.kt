@@ -23,6 +23,7 @@ import com.example.simullim.R
 import com.simullim.compose.TwoButtonDialog
 import com.simullim.compose.ui.theme.DarkGrey
 import com.simullim.compose.ui.theme.SimullimTheme
+import com.simullim.debugtest.DebugTestScreen
 import com.simullim.main.MainScreen
 import com.simullim.playinfo.PlayInfoScreen
 import com.simullim.playinfo.PlayInfoViewModel
@@ -89,7 +90,8 @@ internal class MainActivity : FragmentActivity(), MainEventReceiver {
                     composable(route = Page.MAIN.name) {
                         MainScreen(
                             onClickStart = { navController.navigate(Page.PLAY_SETTING.name) },
-                            onClickQuit = { showQuitDialog = true })
+                            onClickQuit = { showQuitDialog = true },
+                            onClickDebugTest = { navController.navigate(Page.DEBUG_TEST.name) })
                     }
 
                     composable(route = Page.PLAY_SETTING.name) {
@@ -105,6 +107,9 @@ internal class MainActivity : FragmentActivity(), MainEventReceiver {
                             playInfoViewModel = playInfoViewModel,
                             onClickBack = navController::popBackStack
                         )
+                    }
+                    composable(route = Page.DEBUG_TEST.name) {
+                        DebugTestScreen(mainViewModel = mainViewModel)
                     }
                 }
                 if (showQuitDialog) {
@@ -138,5 +143,13 @@ internal class MainActivity : FragmentActivity(), MainEventReceiver {
 
     override fun onSetPlaylist() {
         playlistResult.launch(Unit)
+    }
+
+    override fun onPlayPause() {
+        playServiceManager.pause()
+    }
+
+    override fun onPlayStop() {
+        playServiceManager.stop()
     }
 }

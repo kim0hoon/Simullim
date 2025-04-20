@@ -12,12 +12,17 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.simullim.BuildConfig
 import com.example.simullim.R
 import com.simullim.compose.RoundedParkGreenBox
 import com.simullim.compose.RoundedParkGreenButton
 
 @Composable
-internal fun MainScreen(onClickStart: () -> Unit, onClickQuit: () -> Unit) {
+internal fun MainScreen(
+    onClickStart: () -> Unit,
+    onClickQuit: () -> Unit,
+    onClickDebugTest: () -> Unit
+) {
     RoundedParkGreenBox(
         modifier = Modifier
             .padding(dimensionResource(R.dimen.screen_padding_dp))
@@ -39,6 +44,16 @@ internal fun MainScreen(onClickStart: () -> Unit, onClickQuit: () -> Unit) {
                 innerPaddingVertical = 8.dp,
                 innerPaddingHorizontal = 8.dp
             )
+            if (BuildConfig.BUILD_TYPE == "debug") {
+                Spacer(modifier = Modifier.height(8.dp))
+                RoundedParkGreenButton(
+                    onClick = onClickDebugTest,
+                    buttonText = stringResource(R.string.debug_test),
+                    modifier = Modifier.fillMaxWidth(),
+                    innerPaddingVertical = 8.dp,
+                    innerPaddingHorizontal = 8.dp
+                )
+            }
         }
     }
 }
@@ -46,5 +61,5 @@ internal fun MainScreen(onClickStart: () -> Unit, onClickQuit: () -> Unit) {
 @Preview
 @Composable
 private fun MainScreenPreview() {
-    MainScreen({}) { }
+    MainScreen({}, {}) { }
 }
