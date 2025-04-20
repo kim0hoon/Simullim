@@ -36,4 +36,13 @@
     <string name="play_setting_summary_total_distance">총 거리</string>
     <string name="play_setting_summary_total_time">총 시간</string>
     <string name="play_setting_title">플레이 설정</string>
+
+    <string name="play_info_title">플레이 정보</string>
+    <string name="play_info_elapsed_time">경과 시간</string>
+    <string name="play_info_total_distance">총 거리</string>
+    <string name="play_info_average_velocity">평균 속도</string>
+    <string name="play_info_current_velocity">현재 속도</string>
+    <string name="play_info_track_progress">트랙 진행도</string>
+    <string name="play_info_current_progress">현재 음악</string>
+    <string name="play_info_unknown_track_name">알 수 없음</string>
 </resources>

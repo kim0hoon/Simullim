@@ -101,7 +101,10 @@ internal class MainActivity : FragmentActivity(), MainEventReceiver {
                         )
                     }
                     composable(route = Page.PLAY_INFO.name) {
-                        PlayInfoScreen(playInfoViewModel = playInfoViewModel)
+                        PlayInfoScreen(
+                            playInfoViewModel = playInfoViewModel,
+                            onClickBack = navController::popBackStack
+                        )
                     }
                 }
                 if (showQuitDialog) {
