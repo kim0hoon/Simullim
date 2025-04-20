@@ -7,6 +7,7 @@ internal interface MainEventReceiver {
             MainEvent.SET_PLAYLIST -> onSetPlaylist()
             MainEvent.PAUSE -> onPlayPause()
             MainEvent.STOP -> onPlayStop()
+            MainEvent.RESUME -> onPlayResume()
         }
     }
 
@@ -14,4 +15,5 @@ internal interface MainEventReceiver {
     fun onSetPlaylist()
     fun onPlayPause()
     fun onPlayStop()
+    fun onPlayResume()
 }

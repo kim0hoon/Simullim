@@ -152,4 +152,8 @@ internal class MainActivity : FragmentActivity(), MainEventReceiver {
     override fun onPlayStop() {
         playServiceManager.stop()
     }
+
+    override fun onPlayResume() {
+        playServiceManager.play()
+    }
 }
