@@ -34,6 +34,15 @@ internal fun DebugTestScreen(mainViewModel: MainViewModel = viewModel()) {
         }
         item {
             RoundedParkGreenButton(
+                buttonText = stringResource(R.string.debug_test_service_resume),
+                onClick = {
+                    mainViewModel.sendMainEvent(mainEvent = MainEvent.RESUME)
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        item {
+            RoundedParkGreenButton(
                 buttonText = stringResource(R.string.debug_test_service_stop),
                 onClick = {
                     mainViewModel.sendMainEvent(mainEvent = MainEvent.STOP)

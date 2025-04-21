@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import timber.log.Timber
 
+//TODO 정지 후 시간 계속 흐르는 현상 수정
 class GpsTracker(private val context: Context) {
     private val fusedLocationClient get() = LocationServices.getFusedLocationProviderClient(context)
     private val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 2000)

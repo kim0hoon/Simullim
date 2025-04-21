@@ -40,6 +40,7 @@
 
     <string name="debug_test_service_start">서비스 시작</string>
     <string name="debug_test_service_pause">일시정지</string>
+    <string name="debug_test_service_resume">재개</string>
     <string name="debug_test_service_stop">정지</string>
 
     <string name="play_info_title">플레이 정보</string>
