@@ -22,13 +22,22 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import timber.log.Timber
 
-//TODO 정지 후 시간 계속 흐르는 현상 수정
 class GpsTracker(private val context: Context) {
     private val fusedLocationClient get() = LocationServices.getFusedLocationProviderClient(context)
     private val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 2000)
         .setMinUpdateIntervalMillis(1000)
         .build()
     private val locationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            locationResult.lastLocation?.let {
+                updateWithEmitLocation(it)
+            }
+        }
+    }
+    private val oneShotLocationRequest =
+        LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1).setMaxUpdates(1)
+            .setMinUpdateIntervalMillis(1).build()
+    private val oneShotLocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             locationResult.lastLocation?.let {
                 updateWithEmitLocation(it)
@@ -66,6 +75,7 @@ class GpsTracker(private val context: Context) {
 
     @RequiresPermission(ACCESS_FINE_LOCATION)
     private fun startTracking() {
+        lastLocation = null
         fusedLocationClient.requestLocationUpdates(
             locationRequest,
             locationCallback,
@@ -84,13 +94,28 @@ class GpsTracker(private val context: Context) {
         _errorEventChannel.trySend(event)
     }
 
+    @RequiresPermission(ACCESS_FINE_LOCATION)
     fun pause() {
+        executeOneShotLocationRequest()
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+    }
+
+    fun pauseNotUpdated() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
     fun stop() {
         _gpsDataStateFlow.value = GpsDataModel()
         fusedLocationClient.removeLocationUpdates(locationCallback)
+    }
+
+    @RequiresPermission(ACCESS_FINE_LOCATION)
+    private fun executeOneShotLocationRequest() {
+        fusedLocationClient.requestLocationUpdates(
+            oneShotLocationRequest,
+            oneShotLocationCallback,
+            Looper.getMainLooper()
+        )
     }
 
     private fun updateWithEmitLocation(location: Location) {

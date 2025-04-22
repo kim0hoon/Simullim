@@ -59,7 +59,13 @@ internal class PlayService : Service() {
     }
 
     fun pause() {
-        gpsTracker.pause()
+        val hasPermission = ActivityCompat.checkSelfPermission(
+            this,
+            ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+        if (hasPermission) gpsTracker.pause()
+        else gpsTracker.pauseNotUpdated()
+
     }
 
     fun stop() {
