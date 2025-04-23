@@ -27,6 +27,7 @@ import com.simullim.debugtest.DebugTestScreen
 import com.simullim.main.MainScreen
 import com.simullim.playinfo.PlayInfoScreen
 import com.simullim.playinfo.PlayInfoViewModel
+import com.simullim.playinfo.model.PlayInfoModel
 import com.simullim.playsetting.PlaySettingScreen
 import com.simullim.playsetting.PlaySettingViewModel
 import com.simullim.playsetting.model.PlaySettingPlaylistModel
@@ -37,7 +38,6 @@ internal class MainActivity : FragmentActivity(), MainEventReceiver {
     private val mainViewModel by viewModels<MainViewModel>()
     private val playSettingViewModel by viewModels<PlaySettingViewModel>()
     private val playInfoViewModel by viewModels<PlayInfoViewModel>()
-
     private val playlistResult = registerForActivityResult(MusicPickerResultContract()) {
         val playlistModel = it?.map { musicModel ->
             PlaySettingPlaylistModel.Playlist(
@@ -52,7 +52,14 @@ internal class MainActivity : FragmentActivity(), MainEventReceiver {
         lifecycleOwner = this,
         context = this,
         onGpsDataEmitted = {
-            Timber.d("data emitted : $it")
+            playInfoViewModel.setPlayInfo(
+                PlayInfoModel(
+                    timeSec = millsToSec(it.totalTimeMills).toInt(),
+                    totalDistanceMeter = it.totalDistanceMeter.toInt(),
+                    averageVelocity = meterPerSecToSecPerKiloMeter(it.averageVelocity).toInt(),
+                    velocity = meterPerSecToSecPerKiloMeter(it.currentVelocity).toInt()
+                )
+            )
         },
         onErrorEvent = {})
     private val locationPermissionManager =
