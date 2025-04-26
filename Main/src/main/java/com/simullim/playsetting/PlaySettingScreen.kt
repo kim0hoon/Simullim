@@ -61,7 +61,7 @@ internal fun PlaySettingScreen(
                     PlaylistSection(
                         model = playListModel, modifier = Modifier.padding(bottom = 16.dp),
                         onClick = {
-                            mainViewModel.sendMainEvent(MainEvent.SET_PLAYLIST)
+                            mainViewModel.sendMainEvent(MainEvent.SetPlaylist)
                         }
                     )
                 }

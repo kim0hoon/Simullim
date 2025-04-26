@@ -3,6 +3,7 @@ package com.example.music_picker
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -65,7 +66,10 @@ internal fun PlayList(
                 onClickRemove = onClickRemove,
                 modifier = Modifier.fillMaxWidth()
             )
-            LazyColumn(contentPadding = PaddingValues(vertical = 4.dp)) {
+            LazyColumn(
+                contentPadding = PaddingValues(vertical = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
                 itemsIndexed(playItems) { idx, playItem ->
                     PlayListItem(
                         model = playItem,
