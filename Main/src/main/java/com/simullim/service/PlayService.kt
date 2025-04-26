@@ -22,6 +22,9 @@ internal class PlayService : Service() {
 
     val gpsDataStateFlow get() = gpsTracker.gpsDataStateFlow
 
+    //TODO combine state flow
+    val statusStateFlow = gpsTracker.statusStateFlow
+
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
