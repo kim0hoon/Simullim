@@ -59,8 +59,7 @@ internal class MainActivity : FragmentActivity(), MainEventReceiver {
                     velocity = meterPerSecToSecPerKiloMeter(it.currentVelocity).toInt()
                 )
             )
-        },
-        onErrorEvent = {})
+        })
     private val locationPermissionManager = PermissionManager(activity = this)
 
 

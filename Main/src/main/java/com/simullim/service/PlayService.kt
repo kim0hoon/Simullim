@@ -13,6 +13,7 @@ import androidx.core.app.NotificationCompat
 import com.example.gps_tracker.GpsTracker
 import com.example.simullim.R
 
+//TODO 상태 flow 추가
 internal class PlayService : Service() {
     private val gpsTracker by lazy {
         GpsTracker(this)
@@ -20,7 +21,6 @@ internal class PlayService : Service() {
     private val binder = PlayServiceBinder()
 
     val gpsDataStateFlow get() = gpsTracker.gpsDataStateFlow
-    val errorEventFlow get() = gpsTracker.errorEventFlow
 
     override fun onCreate() {
         super.onCreate()

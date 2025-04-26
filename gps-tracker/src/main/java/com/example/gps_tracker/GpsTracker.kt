@@ -5,7 +5,6 @@ import android.content.Context
 import android.location.Location
 import android.os.Looper
 import androidx.annotation.RequiresPermission
-import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -15,16 +14,14 @@ import com.google.android.gms.location.LocationSettingsResponse
 import com.google.android.gms.location.Priority
 import com.google.android.gms.location.SettingsClient
 import com.simullim.millsToSec
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import timber.log.Timber
 
 class GpsTracker(private val context: Context) {
     private val fusedLocationClient get() = LocationServices.getFusedLocationProviderClient(context)
-    private val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 2000)
+    private val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
         .setMinUpdateIntervalMillis(1000)
         .build()
     private val locationCallback = object : LocationCallback() {
@@ -51,8 +48,8 @@ class GpsTracker(private val context: Context) {
     var lastLocation: Location? = null
         private set
 
-    private val _errorEventChannel = Channel<GpsTrackError>(capacity = Channel.CONFLATED)
-    val errorEventFlow = _errorEventChannel.receiveAsFlow()
+    private val _statusStateFlow = MutableStateFlow<Status>(Status.Paused)
+    val statusStateFlow = _statusStateFlow.asStateFlow()
 
     @RequiresPermission(ACCESS_FINE_LOCATION)
     fun start() {
@@ -81,32 +78,32 @@ class GpsTracker(private val context: Context) {
             locationCallback,
             Looper.getMainLooper()
         )
+        _statusStateFlow.value = Status.Tracking
     }
 
     private fun onFailureCheckLocationSetting(exception: Exception) {
-        val event =
-            if (exception is ResolvableApiException) GpsTrackError.Location(exception) else GpsTrackError.Unknown(
-                exception
-            )
         exception.message?.let {
             Timber.e(it)
         }
-        _errorEventChannel.trySend(event)
+        _statusStateFlow.value = Status.Error(exception)
     }
 
     @RequiresPermission(ACCESS_FINE_LOCATION)
     fun pause() {
         executeOneShotLocationRequest()
         fusedLocationClient.removeLocationUpdates(locationCallback)
+        _statusStateFlow.value = Status.Paused
     }
 
     fun pauseNotUpdated() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
+        _statusStateFlow.value = Status.Paused
     }
 
     fun stop() {
         _gpsDataStateFlow.value = GpsDataModel()
         fusedLocationClient.removeLocationUpdates(locationCallback)
+        _statusStateFlow.value = Status.Paused
     }
 
     @RequiresPermission(ACCESS_FINE_LOCATION)
@@ -116,6 +113,7 @@ class GpsTracker(private val context: Context) {
             oneShotLocationCallback,
             Looper.getMainLooper()
         )
+        _statusStateFlow.value = Status.Tracking
     }
 
     private fun updateWithEmitLocation(location: Location) {

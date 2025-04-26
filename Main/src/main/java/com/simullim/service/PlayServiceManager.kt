@@ -6,9 +6,9 @@ import androidx.core.content.ContextCompat.startForegroundService
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.example.gps_tracker.GpsDataModel
-import com.example.gps_tracker.GpsTrackError
 import com.simullim.collectOnLifecycle
 
+//TODO 상태관리 stateflow 추가
 /**
  * PlayService를 관리하는 함수
  */
@@ -16,7 +16,6 @@ internal class PlayServiceManager(
     private val lifecycleOwner: LifecycleOwner,
     private val context: Context,
     private val onGpsDataEmitted: (GpsDataModel) -> Unit,
-    private val onErrorEvent: (GpsTrackError) -> Unit
 ) : DefaultLifecycleObserver {
     private val playServiceConnection = PlayServiceConnection(onConnected = { isBound = true },
         onDisConnected = { isBound = false })
@@ -36,9 +35,6 @@ internal class PlayServiceManager(
         service?.run {
             gpsDataStateFlow.collectOnLifecycle(lifecycleOwner) {
                 onGpsDataEmitted(it)
-            }
-            errorEventFlow.collectOnLifecycle(lifecycleOwner) {
-                onErrorEvent(it)
             }
         }
         play()
