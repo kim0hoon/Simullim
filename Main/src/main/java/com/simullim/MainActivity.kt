@@ -32,7 +32,6 @@ import com.simullim.playsetting.PlaySettingScreen
 import com.simullim.playsetting.PlaySettingViewModel
 import com.simullim.playsetting.model.PlaySettingPlaylistModel
 import com.simullim.service.PlayServiceManager
-import timber.log.Timber
 
 internal class MainActivity : FragmentActivity(), MainEventReceiver {
     private val mainViewModel by viewModels<MainViewModel>()
@@ -62,20 +61,7 @@ internal class MainActivity : FragmentActivity(), MainEventReceiver {
             )
         },
         onErrorEvent = {})
-    private val locationPermissionManager =
-        PermissionManager(
-            activity = this,
-            onGranted = {
-                playServiceManager.startService()
-            },
-            onShouldShowRationale = {
-                Timber.d("onShouldShow")
-            },
-            onDenied = {
-                Timber.d("onDenied : $it")
-            },
-            permissions = listOf(Manifest.permission.ACCESS_FINE_LOCATION)
-        )
+    private val locationPermissionManager = PermissionManager(activity = this)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,7 +91,13 @@ internal class MainActivity : FragmentActivity(), MainEventReceiver {
                         PlaySettingScreen(
                             mainViewModel = mainViewModel,
                             playSettingViewModel = playSettingViewModel,
-                            onClickStart = { navController.navigate(Page.PLAY_INFO.name) },
+                            onClickStart = {
+                                mainViewModel.sendMainEvent(MainEvent.Play(onGranted = {
+                                    navController.navigate(
+                                        Page.PLAY_INFO.name
+                                    )
+                                }))
+                            },
                             onClickBack = navController::popBackStack
                         )
                     }
@@ -144,8 +136,20 @@ internal class MainActivity : FragmentActivity(), MainEventReceiver {
         }
     }
 
-    override fun onPlay() {
-        locationPermissionManager.executeWithCheckPermissions()
+    override fun onPlay(onGranted: (() -> Unit)?) {
+        locationPermissionManager.executeWithCheckPermissions(
+            onGranted = {
+                onGranted?.invoke()
+                playServiceManager.startService()
+            },
+            onShouldShowRationale = {
+                //TODO 안내 추가
+            },
+            onDenied = {
+                //TODO 거절한 케이스
+            },
+            permissions = listOf(Manifest.permission.ACCESS_FINE_LOCATION)
+        )
     }
 
     override fun onSetPlaylist() {

@@ -3,15 +3,15 @@ package com.simullim
 internal interface MainEventReceiver {
     fun handleEvent(mainEvent: MainEvent) {
         when (mainEvent) {
-            MainEvent.PLAY -> onPlay()
-            MainEvent.SET_PLAYLIST -> onSetPlaylist()
-            MainEvent.PAUSE -> onPlayPause()
-            MainEvent.STOP -> onPlayStop()
-            MainEvent.RESUME -> onPlayResume()
+            is MainEvent.Play -> onPlay(onGranted = mainEvent.onGranted)
+            is MainEvent.SetPlaylist -> onSetPlaylist()
+            is MainEvent.Pause -> onPlayPause()
+            is MainEvent.Stop -> onPlayStop()
+            is MainEvent.Resume -> onPlayResume()
         }
     }
 
-    fun onPlay()
+    fun onPlay(onGranted: (() -> Unit)?)
     fun onSetPlaylist()
     fun onPlayPause()
     fun onPlayStop()
