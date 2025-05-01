@@ -18,7 +18,7 @@ internal fun DebugTestScreen(mainViewModel: MainViewModel = viewModel()) {
             RoundedParkGreenButton(
                 buttonText = stringResource(R.string.debug_test_service_start),
                 onClick = {
-                    mainViewModel.sendMainEvent(mainEvent = MainEvent.PLAY)
+                    mainViewModel.sendMainEvent(mainEvent = MainEvent.Play())
                 },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -27,7 +27,16 @@ internal fun DebugTestScreen(mainViewModel: MainViewModel = viewModel()) {
             RoundedParkGreenButton(
                 buttonText = stringResource(R.string.debug_test_service_pause),
                 onClick = {
-                    mainViewModel.sendMainEvent(mainEvent = MainEvent.PAUSE)
+                    mainViewModel.sendMainEvent(mainEvent = MainEvent.Pause)
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        item {
+            RoundedParkGreenButton(
+                buttonText = stringResource(R.string.debug_test_service_resume),
+                onClick = {
+                    mainViewModel.sendMainEvent(mainEvent = MainEvent.Resume)
                 },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -36,7 +45,7 @@ internal fun DebugTestScreen(mainViewModel: MainViewModel = viewModel()) {
             RoundedParkGreenButton(
                 buttonText = stringResource(R.string.debug_test_service_stop),
                 onClick = {
-                    mainViewModel.sendMainEvent(mainEvent = MainEvent.STOP)
+                    mainViewModel.sendMainEvent(mainEvent = MainEvent.Stop)
                 },
                 modifier = Modifier.fillMaxWidth()
             )

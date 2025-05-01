@@ -13,6 +13,7 @@ import androidx.core.app.NotificationCompat
 import com.example.gps_tracker.GpsTracker
 import com.example.simullim.R
 
+//TODO 상태 flow 추가
 internal class PlayService : Service() {
     private val gpsTracker by lazy {
         GpsTracker(this)
@@ -20,7 +21,9 @@ internal class PlayService : Service() {
     private val binder = PlayServiceBinder()
 
     val gpsDataStateFlow get() = gpsTracker.gpsDataStateFlow
-    val errorEventFlow get() = gpsTracker.errorEventFlow
+
+    //TODO combine state flow
+    val statusStateFlow = gpsTracker.statusStateFlow
 
     override fun onCreate() {
         super.onCreate()
@@ -59,7 +62,13 @@ internal class PlayService : Service() {
     }
 
     fun pause() {
-        gpsTracker.pause()
+        val hasPermission = ActivityCompat.checkSelfPermission(
+            this,
+            ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+        if (hasPermission) gpsTracker.pause()
+        else gpsTracker.pauseNotUpdated()
+
     }
 
     fun stop() {

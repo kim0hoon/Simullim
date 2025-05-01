@@ -16,4 +16,12 @@ internal class PlayInfoViewModel : ViewModel() {
 
     private val _playTrackStateFlow = MutableStateFlow(PlayInfoTrack())
     val playTrackStateFlow = _playTrackStateFlow.asStateFlow()
+
+    fun setPlayInfo(playInfo: PlayInfoModel) {
+        _playInfoStateFlow.value = playInfo
+    }
+
+    fun setPlayTrack(playInfoTrack: PlayInfoTrack) {
+        _playTrackStateFlow.value = playInfoTrack
+    }
 }

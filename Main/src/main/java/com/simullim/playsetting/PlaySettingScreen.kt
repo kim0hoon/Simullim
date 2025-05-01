@@ -61,7 +61,7 @@ internal fun PlaySettingScreen(
                     PlaylistSection(
                         model = playListModel, modifier = Modifier.padding(bottom = 16.dp),
                         onClick = {
-                            mainViewModel.sendMainEvent(MainEvent.SET_PLAYLIST)
+                            mainViewModel.sendMainEvent(MainEvent.SetPlaylist)
                         }
                     )
                 }
@@ -119,7 +119,9 @@ internal fun PlaySettingScreen(
 
         PlayButton(
             onClick = onClickStart,
-            isEnabled = playListModel.playlist.isNotEmpty() && paceSettingModel.paceList.isNotEmpty(),
+            isEnabled = playListModel.playlist.isNotEmpty() && paceSettingModel.paceList.run {
+                sumOf { it.length } > 0 && sumOf { it.velocitySecPerKiloMeter } > 0
+            },
             modifier = Modifier
                 .padding(top = 8.dp)
                 .fillMaxWidth()
