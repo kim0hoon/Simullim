@@ -20,6 +20,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.music_picker.MusicPickerResultContract
 import com.example.simullim.R
+import com.simullim.common.PlaylistModel
 import com.simullim.compose.TwoButtonDialog
 import com.simullim.compose.ui.theme.DarkGrey
 import com.simullim.compose.ui.theme.SimullimTheme
@@ -30,7 +31,6 @@ import com.simullim.playinfo.PlayInfoViewModel
 import com.simullim.playinfo.model.PlayInfoModel
 import com.simullim.playsetting.PlaySettingScreen
 import com.simullim.playsetting.PlaySettingViewModel
-import com.simullim.playsetting.model.PlaySettingPlaylistModel
 import com.simullim.service.PlayServiceManager
 
 internal class MainActivity : FragmentActivity(), MainEventReceiver {
@@ -39,7 +39,7 @@ internal class MainActivity : FragmentActivity(), MainEventReceiver {
     private val playInfoViewModel by viewModels<PlayInfoViewModel>()
     private val playlistResult = registerForActivityResult(MusicPickerResultContract()) {
         val playlistModel = it?.map { musicModel ->
-            PlaySettingPlaylistModel.Playlist(
+            PlaylistModel.Playlist(
                 title = musicModel.title,
                 durationMills = musicModel.durationMillis ?: 0,
                 url = musicModel.uriString

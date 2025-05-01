@@ -22,11 +22,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.simullim.R
 import com.simullim.MainEvent
 import com.simullim.MainViewModel
+import com.simullim.common.PaceSetting
 import com.simullim.compose.CommonHeader
 import com.simullim.compose.CommonHeaderIcon
 import com.simullim.compose.RoundedParkGreenBox
 import com.simullim.compose.ui.theme.DarkGrey
-import com.simullim.playsetting.model.PaceSetting
 
 @Composable
 internal fun PlaySettingScreen(
