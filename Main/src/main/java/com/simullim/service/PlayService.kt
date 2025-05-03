@@ -99,13 +99,18 @@ internal class PlayService : Service() {
             this,
             ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
-        if (hasPermission) gpsTracker?.pause()
-        else gpsTracker?.pauseNotUpdated()
-
+        withNotNullServices { gpsTracker, musicPlayer ->
+            if (hasPermission) gpsTracker.pause()
+            else gpsTracker.pauseNotUpdated()
+            musicPlayer.pause()
+        }
     }
 
     fun stop() {
-        gpsTracker?.stop()
+        withNotNullServices { gpsTracker, musicPlayer ->
+            gpsTracker.stop()
+            musicPlayer.stop()
+        }
     }
 
     inner class PlayServiceBinder : Binder() {
@@ -123,8 +128,10 @@ internal class PlayService : Service() {
     }
 
     private fun release() {
-        musicPlayer?.release()
-        gpsTracker?.release()
+        withNotNullServices { gpsTracker, musicPlayer ->
+            musicPlayer.release()
+            gpsTracker.release()
+        }
         musicPlayer = null
         gpsTracker = null
     }
