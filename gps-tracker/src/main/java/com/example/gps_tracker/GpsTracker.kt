@@ -53,6 +53,7 @@ class GpsTracker(private val context: Context) {
 
     @RequiresPermission(ACCESS_FINE_LOCATION)
     fun start() {
+        if (statusStateFlow.value is Status.Tracking) return
         checkLocationSetting(onSuccess = {
             startTracking()
         }, onFailure = ::onFailureCheckLocationSetting)
@@ -104,6 +105,13 @@ class GpsTracker(private val context: Context) {
         _gpsDataStateFlow.value = GpsDataModel()
         fusedLocationClient.removeLocationUpdates(locationCallback)
         _statusStateFlow.value = Status.Paused
+    }
+
+    fun release() {
+        fusedLocationClient.run {
+            removeLocationUpdates(locationCallback)
+            removeLocationUpdates(oneShotLocationCallback)
+        }
     }
 
     @RequiresPermission(ACCESS_FINE_LOCATION)

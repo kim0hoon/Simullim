@@ -7,6 +7,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.example.gps_tracker.GpsDataModel
 import com.simullim.collectOnLifecycle
+import com.simullim.service.model.PlayServiceModel
 
 //TODO 상태관리 stateflow 추가
 /**
@@ -17,7 +18,8 @@ internal class PlayServiceManager(
     private val context: Context,
     private val onGpsDataEmitted: (GpsDataModel) -> Unit,
 ) : DefaultLifecycleObserver {
-    private val playServiceConnection = PlayServiceConnection(onConnected = { isBound = true },
+    private val playServiceConnection = PlayServiceConnection(
+        onConnected = { isBound = true },
         onDisConnected = { isBound = false })
     private val service get() = playServiceConnection.service.takeIf { isBound }
     private val intent by lazy {
@@ -33,11 +35,10 @@ internal class PlayServiceManager(
         startForegroundService(context, intent)
         bindService()
         service?.run {
-            gpsDataStateFlow.collectOnLifecycle(lifecycleOwner) {
+            gpsDataStateFlow?.collectOnLifecycle(lifecycleOwner) {
                 onGpsDataEmitted(it)
             }
         }
-        play()
     }
 
     fun stopService() {
@@ -45,8 +46,8 @@ internal class PlayServiceManager(
         context.stopService(intent)
     }
 
-    fun play() {
-        service?.start {
+    fun play(playServiceModel: PlayServiceModel) {
+        service?.start(playServiceModel = playServiceModel) {
             //TODO onDenied
         }
     }
@@ -57,6 +58,12 @@ internal class PlayServiceManager(
 
     fun stop() {
         service?.stop()
+    }
+
+    fun resume() {
+        service?.resume {
+            //TODO onDenied
+        }
     }
 
     override fun onStart(owner: LifecycleOwner) {

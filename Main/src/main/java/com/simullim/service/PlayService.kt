@@ -12,21 +12,27 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import com.example.gps_tracker.GpsTracker
 import com.example.simullim.R
+import com.musicplayer.MusicPlayer
+import com.simullim.safeLet
+import com.simullim.service.model.PlayServiceModel
+import kotlinx.coroutines.flow.MutableStateFlow
 
-//TODO 상태 flow 추가
+//TODO 상태 flow 추가, gps<->미디어 연동작업
 internal class PlayService : Service() {
-    private val gpsTracker by lazy {
-        GpsTracker(this)
-    }
+    private var gpsTracker: GpsTracker? = null
     private val binder = PlayServiceBinder()
 
-    val gpsDataStateFlow get() = gpsTracker.gpsDataStateFlow
+    val gpsDataStateFlow get() = gpsTracker?.gpsDataStateFlow
+
+    private var musicPlayer: MusicPlayer? = null
 
     //TODO combine state flow
-    val statusStateFlow = gpsTracker.statusStateFlow
+    val statusStateFlow get() = MutableStateFlow(PlayServiceStatus.Initialized)
 
     override fun onCreate() {
         super.onCreate()
+        gpsTracker = GpsTracker(context = this)
+        musicPlayer = MusicPlayer(context = this)
         createNotificationChannel()
         val notification = NotificationCompat.Builder(this, CHANNEL_ID).build()
         startForeground(FOREGROUND_SERVICE_ID, notification)
@@ -49,7 +55,13 @@ internal class PlayService : Service() {
         return START_STICKY
     }
 
-    fun start(onDenied: () -> Unit) {
+    private fun withNotNullServices(block: (gpsTracker: GpsTracker, musicPlayer: MusicPlayer) -> Unit) {
+        safeLet(gpsTracker, musicPlayer) { gpsTracker, musicPlayer ->
+            block(gpsTracker, musicPlayer)
+        }
+    }
+
+    fun start(playServiceModel: PlayServiceModel, onDenied: () -> Unit) {
         if (ActivityCompat.checkSelfPermission(
                 this,
                 ACCESS_FINE_LOCATION
@@ -58,7 +70,28 @@ internal class PlayService : Service() {
             onDenied()
             return
         }
-        gpsTracker.start()
+        withNotNullServices { gpsTracker, musicPlayer ->
+            gpsTracker.start()
+            musicPlayer.run {
+                setMediaItems(uriStrings = playServiceModel.playlistModel.playlist.map { it.url })
+                play()
+            }
+        }
+    }
+
+    fun resume(onDenied: () -> Unit) {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            onDenied()
+            return
+        }
+        withNotNullServices { gpsTracker, musicPlayer ->
+            gpsTracker.start()
+            musicPlayer.play()
+        }
     }
 
     fun pause() {
@@ -66,17 +99,34 @@ internal class PlayService : Service() {
             this,
             ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
-        if (hasPermission) gpsTracker.pause()
-        else gpsTracker.pauseNotUpdated()
+        if (hasPermission) gpsTracker?.pause()
+        else gpsTracker?.pauseNotUpdated()
 
     }
 
     fun stop() {
-        gpsTracker.stop()
+        gpsTracker?.stop()
     }
 
     inner class PlayServiceBinder : Binder() {
         fun getService() = this@PlayService
+    }
+
+    override fun onDestroy() {
+        release()
+        super.onDestroy()
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        release()
+        super.onTaskRemoved(rootIntent)
+    }
+
+    private fun release() {
+        musicPlayer?.release()
+        gpsTracker?.release()
+        musicPlayer = null
+        gpsTracker = null
     }
 
     companion object {
