@@ -32,6 +32,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.simullim.R
+import com.simullim.common.PaceSetting
+import com.simullim.common.PlaylistModel
 import com.simullim.compose.CheckableRoundedParkGreenButton
 import com.simullim.compose.NumberTextInputDialog
 import com.simullim.compose.NumberTextInputDialogParam
@@ -42,8 +44,6 @@ import com.simullim.compose.ui.theme.Typography
 import com.simullim.meterToKiloMeterMeterString
 import com.simullim.millsToHourMinSecString
 import com.simullim.millsToMinSecString
-import com.simullim.playsetting.model.PaceSetting
-import com.simullim.playsetting.model.PlaySettingPlaylistModel
 import com.simullim.secToHourMinSecString
 import com.simullim.secToMinSecString
 
@@ -75,7 +75,7 @@ private fun PlaySettingTitlePreview() {
 
 @Composable
 internal fun PlaylistSection(
-    model: PlaySettingPlaylistModel,
+    model: PlaylistModel,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -140,8 +140,8 @@ internal fun PlaylistEmptyItem(modifier: Modifier = Modifier) {
 @Composable
 @Preview
 private fun PlaylistSectionPreview() {
-    PlaylistSection(model = PlaySettingPlaylistModel(List(30) {
-        PlaySettingPlaylistModel.Playlist(
+    PlaylistSection(model = PlaylistModel(List(30) {
+        PlaylistModel.Playlist(
             title = "title $it",
             durationMills = it.toLong() * 1000,
             url = ""
@@ -152,12 +152,12 @@ private fun PlaylistSectionPreview() {
 @Composable
 @Preview
 private fun PlaylistSectionEmptyPreview() {
-    PlaylistSection(model = PlaySettingPlaylistModel(), onClick = {})
+    PlaylistSection(model = PlaylistModel(), onClick = {})
 }
 
 @Composable
 internal fun PlaylistItem(
-    playlistModel: PlaySettingPlaylistModel.Playlist,
+    playlistModel: PlaylistModel.Playlist,
     modifier: Modifier = Modifier
 ) {
     RoundedParkGreenBox(modifier = modifier) {

@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.simullim.R
+import com.simullim.MainEvent
+import com.simullim.MainViewModel
 import com.simullim.compose.CommonHeader
 import com.simullim.compose.CommonHeaderIcon
 import com.simullim.compose.RoundedParkGreenBox
@@ -26,6 +28,7 @@ import com.simullim.compose.RoundedParkGreenBox
 @Composable
 internal fun PlayInfoScreen(
     onClickBack: () -> Unit,
+    mainViewModel: MainViewModel = viewModel(),
     playInfoViewModel: PlayInfoViewModel = viewModel()
 ) {
     val playInfoModel by playInfoViewModel.playInfoStateFlow.collectAsStateWithLifecycle()
@@ -69,8 +72,13 @@ internal fun PlayInfoScreen(
                 }
             }
         }
-        //TODO onClick
-        ControllerSection(playStatus = playStatus, {}, {}, modifier = Modifier.padding(top = 8.dp))
+        ControllerSection(
+            playStatus = playStatus,
+            onClickPlay = { mainViewModel.sendMainEvent(MainEvent.Resume) },
+            onClickPause = { mainViewModel.sendMainEvent(MainEvent.Pause) },
+            onClickStop = { mainViewModel.sendMainEvent(MainEvent.Stop) },
+            modifier = Modifier.padding(top = 8.dp)
+        )
     }
 
 

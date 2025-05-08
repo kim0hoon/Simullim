@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "com.example.simullim"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.simullim"
         minSdk = 28
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -54,6 +54,8 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":music-picker"))
     implementation(project(":gps-tracker"))
+    implementation(project(":musicplayer"))
+    implementation(libs.androidx.lifecycle.service)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

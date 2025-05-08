@@ -22,17 +22,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.simullim.R
 import com.simullim.MainEvent
 import com.simullim.MainViewModel
+import com.simullim.common.PaceSetting
 import com.simullim.compose.CommonHeader
 import com.simullim.compose.CommonHeaderIcon
 import com.simullim.compose.RoundedParkGreenBox
 import com.simullim.compose.ui.theme.DarkGrey
-import com.simullim.playsetting.model.PaceSetting
+import com.simullim.service.model.PlayServiceInputModel
 
 @Composable
 internal fun PlaySettingScreen(
     mainViewModel: MainViewModel = viewModel(),
     playSettingViewModel: PlaySettingViewModel = viewModel(),
-    onClickStart: () -> Unit,
+    onClickStart: (PlayServiceInputModel) -> Unit,
     onClickBack: () -> Unit
 ) {
     val playListModel = playSettingViewModel.playListStateFlow.collectAsStateWithLifecycle().value
@@ -118,7 +119,14 @@ internal fun PlaySettingScreen(
         }
 
         PlayButton(
-            onClick = onClickStart,
+            onClick = {
+                val playServiceInputModel =
+                    PlayServiceInputModel(
+                        playlistModel = playListModel,
+                        paceSetting = paceSettingModel
+                    )
+                onClickStart(playServiceInputModel)
+            },
             isEnabled = playListModel.playlist.isNotEmpty() && paceSettingModel.paceList.run {
                 sumOf { it.length } > 0 && sumOf { it.velocitySecPerKiloMeter } > 0
             },
