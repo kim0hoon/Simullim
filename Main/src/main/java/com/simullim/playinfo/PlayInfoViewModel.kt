@@ -24,4 +24,8 @@ internal class PlayInfoViewModel : ViewModel() {
     fun setPlayTrack(playInfoTrack: PlayInfoTrack) {
         _playTrackStateFlow.value = playInfoTrack
     }
+
+    fun setPlayStatus(playStatus: PlayStatus) {
+        _playStatusStateFlow.value = playStatus
+    }
 }

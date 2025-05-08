@@ -2,9 +2,9 @@ package com.simullim.debugtest
 
 import com.simullim.common.PaceSetting
 import com.simullim.common.PlaylistModel
-import com.simullim.service.model.PlayServiceModel
+import com.simullim.service.model.PlayServiceInputModel
 
-internal val testPlayServiceModel = PlayServiceModel(
+internal val testPlayServiceInputModel = PlayServiceInputModel(
     playlistModel = PlaylistModel(),
     paceSetting = PaceSetting(PaceSetting.Type.Default).withPaceList(buildList {
         var acc = 0

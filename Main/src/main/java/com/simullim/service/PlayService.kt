@@ -3,22 +3,27 @@ package com.simullim.service
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Binder
 import android.os.IBinder
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.LifecycleService
 import com.example.gps_tracker.GpsTracker
 import com.example.simullim.R
 import com.musicplayer.MusicPlayer
+import com.musicplayer.Status
+import com.simullim.collectOnLifecycle
 import com.simullim.safeLet
-import com.simullim.service.model.PlayServiceModel
+import com.simullim.service.model.PlayServiceInputModel
+import com.simullim.service.model.PlayServiceStatus
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 
-//TODO 상태 flow 추가, gps<->미디어 연동작업
-internal class PlayService : Service() {
+internal class PlayService : LifecycleService() {
     private var gpsTracker: GpsTracker? = null
     private val binder = PlayServiceBinder()
 
@@ -26,16 +31,37 @@ internal class PlayService : Service() {
 
     private var musicPlayer: MusicPlayer? = null
 
-    //TODO combine state flow
-    val statusStateFlow get() = MutableStateFlow(PlayServiceStatus.Initialized)
+    private val _statusStateFlow =
+        MutableStateFlow<PlayServiceStatus>(PlayServiceStatus.Initialized)
+    val statusStateFlow = _statusStateFlow.asStateFlow()
+
 
     override fun onCreate() {
         super.onCreate()
         gpsTracker = GpsTracker(context = this)
         musicPlayer = MusicPlayer(context = this)
+        withNotNullServices { gpsTracker, musicPlayer ->
+            combine(
+                gpsTracker.statusStateFlow,
+                musicPlayer.statusStateFlow
+            ) { gpsStatus, musicStatus ->
+                if (gpsStatus is com.example.gps_tracker.Status.Error) PlayServiceStatus.Error(
+                    gpsStatus.exception
+                )
+                else if (musicStatus is Status.Error) PlayServiceStatus.Error(musicStatus.exception)
+                else null
+            }.distinctUntilChanged().collectOnLifecycle(lifecycleOwner = this) {
+                it?.let {
+                    gpsTracker.stop()
+                    musicPlayer.stop()
+                    _statusStateFlow.value = it
+                }
+            }
+        }
         createNotificationChannel()
         val notification = NotificationCompat.Builder(this, CHANNEL_ID).build()
         startForeground(FOREGROUND_SERVICE_ID, notification)
+        _statusStateFlow.value = PlayServiceStatus.Ready
     }
 
     private fun createNotificationChannel() {
@@ -49,9 +75,13 @@ internal class PlayService : Service() {
         notificationManager.createNotificationChannel(notificationChannel)
     }
 
-    override fun onBind(intent: Intent?): IBinder = binder
+    override fun onBind(intent: Intent): IBinder {
+        super.onBind(intent)
+        return binder
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
         return START_STICKY
     }
 
@@ -61,7 +91,7 @@ internal class PlayService : Service() {
         }
     }
 
-    fun start(playServiceModel: PlayServiceModel, onDenied: () -> Unit) {
+    fun start(playServiceInputModel: PlayServiceInputModel, onDenied: () -> Unit) {
         if (ActivityCompat.checkSelfPermission(
                 this,
                 ACCESS_FINE_LOCATION
@@ -73,9 +103,10 @@ internal class PlayService : Service() {
         withNotNullServices { gpsTracker, musicPlayer ->
             gpsTracker.start()
             musicPlayer.run {
-                setMediaItems(uriStrings = playServiceModel.playlistModel.playlist.map { it.url })
+                setMediaItems(uriStrings = playServiceInputModel.playlistModel.playlist.map { it.url })
                 play()
             }
+            _statusStateFlow.value = PlayServiceStatus.Playing
         }
     }
 
@@ -92,6 +123,7 @@ internal class PlayService : Service() {
             gpsTracker.start()
             musicPlayer.play()
         }
+        _statusStateFlow.value = PlayServiceStatus.Playing
     }
 
     fun pause() {
@@ -104,6 +136,7 @@ internal class PlayService : Service() {
             else gpsTracker.pauseNotUpdated()
             musicPlayer.pause()
         }
+        _statusStateFlow.value = PlayServiceStatus.Paused
     }
 
     fun stop() {
@@ -111,6 +144,7 @@ internal class PlayService : Service() {
             gpsTracker.stop()
             musicPlayer.stop()
         }
+        _statusStateFlow.value = PlayServiceStatus.Paused
     }
 
     inner class PlayServiceBinder : Binder() {
@@ -131,6 +165,7 @@ internal class PlayService : Service() {
         withNotNullServices { gpsTracker, musicPlayer ->
             musicPlayer.release()
             gpsTracker.release()
+            _statusStateFlow.value = PlayServiceStatus.Released
         }
         musicPlayer = null
         gpsTracker = null

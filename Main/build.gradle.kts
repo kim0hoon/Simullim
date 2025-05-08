@@ -55,6 +55,7 @@ dependencies {
     implementation(project(":music-picker"))
     implementation(project(":gps-tracker"))
     implementation(project(":musicplayer"))
+    implementation(libs.androidx.lifecycle.service)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -204,16 +204,17 @@ private fun WhiteDivider(modifier: Modifier = Modifier) {
 @Composable
 internal fun ControllerSection(
     playStatus: PlayStatus,
-    toggleStatus: () -> Unit,
+    onClickPlay: () -> Unit,
+    onClickPause: () -> Unit,
     onClickStop: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = modifier) {
         if (playStatus == PlayStatus.PLAYING) PauseButton(
-            onClick = toggleStatus,
+            onClick = onClickPause,
             modifier = Modifier.weight(1f)
         )
-        else ResumeButton(onClick = toggleStatus, modifier = Modifier.weight(1f))
+        else ResumeButton(onClick = onClickPlay, modifier = Modifier.weight(1f))
         StopButton(onClick = onClickStop, modifier = Modifier.weight(1f))
     }
 }
@@ -261,15 +262,16 @@ private fun BaseButton(
     borderColor: Color,
     onClick: () -> Unit,
 ) {
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .border(
-            width = 2.dp,
-            color = borderColor,
-            shape = RoundedCornerShape(10.dp)
-        )
-        .clickable { onClick() }
-        .padding(8.dp)
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                width = 2.dp,
+                color = borderColor,
+                shape = RoundedCornerShape(10.dp)
+            )
+            .clickable { onClick() }
+            .padding(8.dp)
     ) {
         Image(
             painter = painterResource(iconDrawableRes),

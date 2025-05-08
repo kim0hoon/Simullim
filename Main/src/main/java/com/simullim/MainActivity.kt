@@ -32,7 +32,7 @@ import com.simullim.playinfo.model.PlayInfoModel
 import com.simullim.playsetting.PlaySettingScreen
 import com.simullim.playsetting.PlaySettingViewModel
 import com.simullim.service.PlayServiceManager
-import com.simullim.service.model.PlayServiceModel
+import com.simullim.service.model.PlayServiceInputModel
 import timber.log.Timber
 
 internal class MainActivity : FragmentActivity(), MainEventReceiver {
@@ -96,7 +96,7 @@ internal class MainActivity : FragmentActivity(), MainEventReceiver {
                             onClickStart = { playServiceModel ->
                                 mainViewModel.sendMainEvent(
                                     MainEvent.Play(
-                                        playServiceModel = playServiceModel,
+                                        playServiceInputModel = playServiceModel,
                                         onGranted = {
                                             navController.navigate(
                                                 Page.PLAY_INFO.name
@@ -142,12 +142,12 @@ internal class MainActivity : FragmentActivity(), MainEventReceiver {
         }
     }
 
-    override fun onPlay(playServiceModel: PlayServiceModel, onGranted: (() -> Unit)?) {
+    override fun onPlay(playServiceInputModel: PlayServiceInputModel, onGranted: (() -> Unit)?) {
         locationPermissionManager.executeWithCheckPermissions(
             onGranted = {
                 onGranted?.invoke()
                 playServiceManager.startService()
-                playServiceManager.play(playServiceModel = playServiceModel)
+                playServiceManager.play(playServiceInputModel = playServiceInputModel)
             },
             onShouldShowRationale = {
                 //TODO 안내 추가

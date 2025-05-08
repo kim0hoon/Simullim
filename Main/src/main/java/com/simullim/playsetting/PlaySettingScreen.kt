@@ -27,13 +27,13 @@ import com.simullim.compose.CommonHeader
 import com.simullim.compose.CommonHeaderIcon
 import com.simullim.compose.RoundedParkGreenBox
 import com.simullim.compose.ui.theme.DarkGrey
-import com.simullim.service.model.PlayServiceModel
+import com.simullim.service.model.PlayServiceInputModel
 
 @Composable
 internal fun PlaySettingScreen(
     mainViewModel: MainViewModel = viewModel(),
     playSettingViewModel: PlaySettingViewModel = viewModel(),
-    onClickStart: (PlayServiceModel) -> Unit,
+    onClickStart: (PlayServiceInputModel) -> Unit,
     onClickBack: () -> Unit
 ) {
     val playListModel = playSettingViewModel.playListStateFlow.collectAsStateWithLifecycle().value
@@ -120,9 +120,12 @@ internal fun PlaySettingScreen(
 
         PlayButton(
             onClick = {
-                val playServiceModel =
-                    PlayServiceModel(playlistModel = playListModel, paceSetting = paceSettingModel)
-                onClickStart(playServiceModel)
+                val playServiceInputModel =
+                    PlayServiceInputModel(
+                        playlistModel = playListModel,
+                        paceSetting = paceSettingModel
+                    )
+                onClickStart(playServiceInputModel)
             },
             isEnabled = playListModel.playlist.isNotEmpty() && paceSettingModel.paceList.run {
                 sumOf { it.length } > 0 && sumOf { it.velocitySecPerKiloMeter } > 0

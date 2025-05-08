@@ -18,7 +18,7 @@ internal fun DebugTestScreen(mainViewModel: MainViewModel = viewModel()) {
             RoundedParkGreenButton(
                 buttonText = stringResource(R.string.debug_test_service_start),
                 onClick = {
-                    mainViewModel.sendMainEvent(mainEvent = MainEvent.Play(testPlayServiceModel))
+                    mainViewModel.sendMainEvent(mainEvent = MainEvent.Play(testPlayServiceInputModel))
                 },
                 modifier = Modifier.fillMaxWidth()
             )

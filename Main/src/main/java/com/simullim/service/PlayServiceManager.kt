@@ -7,7 +7,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.example.gps_tracker.GpsDataModel
 import com.simullim.collectOnLifecycle
-import com.simullim.service.model.PlayServiceModel
+import com.simullim.service.model.PlayServiceInputModel
 
 //TODO 상태관리 stateflow 추가
 /**
@@ -46,8 +46,8 @@ internal class PlayServiceManager(
         context.stopService(intent)
     }
 
-    fun play(playServiceModel: PlayServiceModel) {
-        service?.start(playServiceModel = playServiceModel) {
+    fun play(playServiceInputModel: PlayServiceInputModel) {
+        service?.start(playServiceInputModel = playServiceInputModel) {
             //TODO onDenied
         }
     }

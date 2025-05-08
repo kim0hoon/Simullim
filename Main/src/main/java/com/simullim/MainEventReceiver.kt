@@ -1,12 +1,12 @@
 package com.simullim
 
-import com.simullim.service.model.PlayServiceModel
+import com.simullim.service.model.PlayServiceInputModel
 
 internal interface MainEventReceiver {
     fun handleEvent(mainEvent: MainEvent) {
         when (mainEvent) {
             is MainEvent.Play -> onPlay(
-                playServiceModel = mainEvent.playServiceModel,
+                playServiceInputModel = mainEvent.playServiceInputModel,
                 onGranted = mainEvent.onGranted
             )
             is MainEvent.SetPlaylist -> onSetPlaylist()
@@ -16,7 +16,7 @@ internal interface MainEventReceiver {
         }
     }
 
-    fun onPlay(playServiceModel: PlayServiceModel, onGranted: (() -> Unit)?)
+    fun onPlay(playServiceInputModel: PlayServiceInputModel, onGranted: (() -> Unit)?)
     fun onSetPlaylist()
     fun onPlayPause()
     fun onPlayStop()
