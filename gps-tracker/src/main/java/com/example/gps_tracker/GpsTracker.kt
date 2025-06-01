@@ -42,7 +42,7 @@ class GpsTracker(private val context: Context) {
         }
     }
 
-    private val _gpsDataStateFlow = MutableStateFlow(GpsDataModel())
+    private val _gpsDataStateFlow = MutableStateFlow(GpsData())
     val gpsDataStateFlow = _gpsDataStateFlow.asStateFlow()
 
     var lastLocation: Location? = null
@@ -53,6 +53,7 @@ class GpsTracker(private val context: Context) {
 
     @RequiresPermission(ACCESS_FINE_LOCATION)
     fun start() {
+        if (statusStateFlow.value is Status.Tracking) return
         checkLocationSetting(onSuccess = {
             startTracking()
         }, onFailure = ::onFailureCheckLocationSetting)
@@ -101,9 +102,16 @@ class GpsTracker(private val context: Context) {
     }
 
     fun stop() {
-        _gpsDataStateFlow.value = GpsDataModel()
+        _gpsDataStateFlow.value = GpsData()
         fusedLocationClient.removeLocationUpdates(locationCallback)
         _statusStateFlow.value = Status.Paused
+    }
+
+    fun release() {
+        fusedLocationClient.run {
+            removeLocationUpdates(locationCallback)
+            removeLocationUpdates(oneShotLocationCallback)
+        }
     }
 
     @RequiresPermission(ACCESS_FINE_LOCATION)
@@ -126,7 +134,7 @@ class GpsTracker(private val context: Context) {
                 it.totalTimeMills + (lastLocation?.let { lastLocation -> location.time - lastLocation.time }
                     ?: 0)
             val averageVelocity = totalDistance / millsToSec(totalTime)
-            GpsDataModel(
+            GpsData(
                 currentVelocity = currentSpeed,
                 averageVelocity = averageVelocity,
                 totalDistanceMeter = totalDistance,

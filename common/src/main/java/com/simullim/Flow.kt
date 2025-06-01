@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 fun <T> Flow<T>.collectOnLifecycle(
     lifecycleOwner: LifecycleOwner,
     state: Lifecycle.State = Lifecycle.State.STARTED,
-    collect: (T) -> Unit
+    collect: suspend (T) -> Unit
 ) = lifecycleOwner.lifecycleScope.launch {
     lifecycleOwner.repeatOnLifecycle(state = state) {
         this@collectOnLifecycle.collect {

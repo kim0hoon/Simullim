@@ -1,5 +1,7 @@
 package com.example.music_picker
 
+import android.content.ClipData
+import android.content.ClipDescription
 import android.content.Intent
 import android.media.MediaMetadataRetriever
 import android.os.Bundle
@@ -21,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.music_picker.model.MusicModel
 import com.example.music_picker.model.PlayItem
@@ -46,7 +49,7 @@ class MainActivity : ComponentActivity() {
                 val metadataRetriever = MediaMetadataRetriever()
                 val projection = arrayOf(MediaStore.Audio.Media.DISPLAY_NAME)
                 val unknownString = getString(R.string.unknown)
-                val playItems = uris.mapNotNull { uri ->
+                val playItems = uris.map { uri ->
                     metadataRetriever.setDataSource(this, uri)
                     val duration =
                         metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
@@ -58,14 +61,12 @@ class MainActivity : ComponentActivity() {
                             it.close()
                             displayName
                         } ?: unknownString
-                    uri.path?.let { path ->
-                        val musicModel = MusicModel(
-                            uriString = path,
-                            title = title,
-                            durationMillis = duration?.toLong()
-                        )
-                        PlayItem(musicModel = musicModel)
-                    }
+                    val musicModel = MusicModel(
+                        uriString = uri.toString(),
+                        title = title,
+                        durationMillis = duration?.toLong()
+                    )
+                    PlayItem(musicModel = musicModel)
                 }
                 metadataRetriever.release()
                 mainViewModel.addPlayItems(playItems)
@@ -123,6 +124,17 @@ class MainActivity : ComponentActivity() {
                         isEnabled = selected.isNotEmpty(),
                         onClick = {
                             val result = Intent().apply {
+                                val description = ClipDescription("audio", arrayOf())
+                                val items =
+                                    ArrayList(selected.map { ClipData.Item(it.musicModel.uriString.toUri()) })
+                                items.firstOrNull()?.let {
+                                    clipData = ClipData(description, it).apply {
+                                        items.forEachIndexed { index, item ->
+                                            if (index > 0) addItem(item)
+                                        }
+                                    }
+                                }
+                                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                                 putParcelableArrayListExtra(
                                     PLAYLIST_RESULT_KEY,
                                     ArrayList(selected.map { it.musicModel })
