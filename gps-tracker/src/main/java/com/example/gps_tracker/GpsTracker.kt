@@ -13,6 +13,7 @@ import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.LocationSettingsResponse
 import com.google.android.gms.location.Priority
 import com.google.android.gms.location.SettingsClient
+import com.simullim.DATA_EMIT_DELAY_MILLS
 import com.simullim.millsToSec
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,9 +22,10 @@ import timber.log.Timber
 
 class GpsTracker(private val context: Context) {
     private val fusedLocationClient get() = LocationServices.getFusedLocationProviderClient(context)
-    private val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
-        .setMinUpdateIntervalMillis(1000)
-        .build()
+    private val locationRequest =
+        LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, DATA_EMIT_DELAY_MILLS)
+            .setMinUpdateIntervalMillis(DATA_EMIT_DELAY_MILLS)
+            .build()
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             locationResult.lastLocation?.let {
