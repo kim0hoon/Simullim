@@ -6,18 +6,14 @@ import androidx.core.content.ContextCompat.startForegroundService
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.example.gps_tracker.GpsData
-import com.simullim.collectOnLifecycle
-import com.simullim.service.model.PlayServiceDataModel
 import com.simullim.service.model.PlayServiceInputModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 //TODO 상태관리 stateflow 추가
 /**
  * PlayService를 관리하는 함수
  */
 internal class PlayServiceManager(
-    private val lifecycleOwner: LifecycleOwner,
+    lifecycleOwner: LifecycleOwner,
     private val context: Context,
     private val onGpsDataEmitted: (GpsData) -> Unit,
 ) : DefaultLifecycleObserver {
@@ -30,9 +26,6 @@ internal class PlayServiceManager(
     }
     private var isBound: Boolean = false
 
-    private val _playDataStateFlow = MutableStateFlow<PlayServiceDataModel>(PlayServiceDataModel())
-    val playDataStateFlow = _playDataStateFlow.asStateFlow()
-
     init {
         lifecycleOwner.lifecycle.addObserver(this)
     }
@@ -41,9 +34,9 @@ internal class PlayServiceManager(
         startForegroundService(context, intent)
         bindService()
         service?.run {
-            gpsDataStateFlow?.collectOnLifecycle(lifecycleOwner) {
-                onGpsDataEmitted(it)
-            }
+//            gpsDataStateFlow?.collectOnLifecycle(lifecycleOwner) {
+//                onGpsDataEmitted(it)
+//            }
         }
     }
 

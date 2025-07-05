@@ -13,9 +13,11 @@ import androidx.lifecycle.LifecycleService
 import com.example.gps_tracker.GpsTracker
 import com.example.simullim.R
 import com.musicplayer.MusicPlayer
+import com.musicplayer.MusicPlayerInput
 import com.musicplayer.Status
 import com.simullim.collectOnLifecycle
 import com.simullim.safeLet
+import com.simullim.service.model.PlayServiceDataModel
 import com.simullim.service.model.PlayServiceInputModel
 import com.simullim.service.model.PlayServiceStatus
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,19 +29,27 @@ internal class PlayService : LifecycleService() {
     private var gpsTracker: GpsTracker? = null
     private val binder = PlayServiceBinder()
 
-    val gpsDataStateFlow get() = gpsTracker?.gpsDataStateFlow
-
     private var musicPlayer: MusicPlayer? = null
 
     private val _statusStateFlow =
         MutableStateFlow<PlayServiceStatus>(PlayServiceStatus.Initialized)
     val statusStateFlow = _statusStateFlow.asStateFlow()
 
+    private val _playServiceDataStateFlow = MutableStateFlow(PlayServiceDataModel())
+    val playServiceDataModel = _playServiceDataStateFlow.asStateFlow()
 
     override fun onCreate() {
         super.onCreate()
         gpsTracker = GpsTracker(context = this)
         musicPlayer = MusicPlayer(context = this)
+        initStatusStateFlow()
+        createNotificationChannel()
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID).build()
+        startForeground(FOREGROUND_SERVICE_ID, notification)
+        _statusStateFlow.value = PlayServiceStatus.Ready
+    }
+
+    private fun initStatusStateFlow() {
         withNotNullServices { gpsTracker, musicPlayer ->
             combine(
                 gpsTracker.statusStateFlow,
@@ -58,10 +68,6 @@ internal class PlayService : LifecycleService() {
                 }
             }
         }
-        createNotificationChannel()
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID).build()
-        startForeground(FOREGROUND_SERVICE_ID, notification)
-        _statusStateFlow.value = PlayServiceStatus.Ready
     }
 
     private fun createNotificationChannel() {
@@ -101,13 +107,33 @@ internal class PlayService : LifecycleService() {
             return
         }
         withNotNullServices { gpsTracker, musicPlayer ->
+            if (playServiceInputModel.playlistModel.totalDurationMills <= 0) {
+                _statusStateFlow.value =
+                    PlayServiceStatus.Error(exception = Exception("playlist total duration must be greater than 0"))
+                return@withNotNullServices
+            }
+            val musicPlayerInput =
+                createMusicPlayerInput(playServiceInputModel = playServiceInputModel)
             gpsTracker.start()
             musicPlayer.run {
-                setMediaItems(uriStrings = playServiceInputModel.playlistModel.playlist.map { it.url })
+                setMediaItems(musicPlayerInputs = musicPlayerInput)
                 play()
             }
             _statusStateFlow.value = PlayServiceStatus.Playing
         }
+    }
+
+    private fun createMusicPlayerInput(playServiceInputModel: PlayServiceInputModel): List<MusicPlayerInput> {
+        val totalDurationMills = playServiceInputModel.paceSetting.totalTimeSec * 1000
+        val oneCycleDurationMills = playServiceInputModel.playlistModel.totalDurationMills
+        val cycle = totalDurationMills / oneCycleDurationMills + 1
+        val fullInput = playServiceInputModel.playlistModel.playlist.map {
+            MusicPlayerInput(
+                uriString = it.url,
+                clipDurationMills = it.durationMills
+            )
+        }
+        return List(cycle.toInt()) { fullInput }.flatten()
     }
 
     fun resume(onDenied: () -> Unit) {
