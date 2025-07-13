@@ -2,6 +2,7 @@ package com.musicplayer
 
 import android.content.Context
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.Player.REPEAT_MODE_OFF
@@ -11,7 +12,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -19,6 +22,9 @@ class MusicPlayer(context: Context) {
     private var player = ExoPlayer.Builder(context).build()
     private val _statusStateFlow = MutableStateFlow<Status>(Status.Initialized)
     val statusStateFlow = _statusStateFlow.asStateFlow()
+
+    private val _trackInfoFlow = MutableSharedFlow<TrackInfo>()
+    val trackInfoFlow = _trackInfoFlow.asSharedFlow()
     private var trackEmitJob: Job? = null
 
     init {
@@ -38,7 +44,7 @@ class MusicPlayer(context: Context) {
                         trackEmitJob?.cancel()
                         trackEmitJob = CoroutineScope(Dispatchers.Main).launch {
                             while (true) {
-                                getCurrentTrack()
+                                _trackInfoFlow.emit(getCurrentTrackInfo())
                                 delay(DATA_EMIT_DELAY_MILLS)
                             }
                         }
@@ -53,6 +59,8 @@ class MusicPlayer(context: Context) {
     fun setMediaItems(musicPlayerInputs: List<MusicPlayerInput>) {
         val mediaItems = musicPlayerInputs.map { input ->
             MediaItem.Builder().setUri(input.uriString).apply {
+                val metaData = MediaMetadata.Builder().setDisplayTitle(input.displayTitle).build()
+                setMediaMetadata(metaData)
                 input.clipDurationMills?.let { clipDurationMills ->
                     setClippingConfiguration(
                         MediaItem.ClippingConfiguration.Builder().setStartPositionMs(0L)
@@ -88,7 +96,12 @@ class MusicPlayer(context: Context) {
         _statusStateFlow.value = Status.Released
     }
 
-    private fun getCurrentTrack() {
-        //TODO 현재 음악 시간 player.currentPosition, player.currentMediaItemIndex
+    private fun getCurrentTrackInfo(): TrackInfo {
+        return TrackInfo(
+            currentName = player.mediaMetadata.displayTitle?.toString(),
+            currentDurationMills = player.currentPosition,
+            currentTotalDurationMills = player.duration,
+            currentTrackIndex = player.currentMediaItemIndex,
+        )
     }
 }
