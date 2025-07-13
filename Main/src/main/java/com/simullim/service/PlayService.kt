@@ -35,6 +35,7 @@ internal class PlayService : LifecycleService() {
         MutableStateFlow<PlayServiceStatus>(PlayServiceStatus.Initialized)
     val statusStateFlow = _statusStateFlow.asStateFlow()
 
+    //TODO 플레이리스트 / Gps 연동작업
     private val _playServiceDataStateFlow = MutableStateFlow(PlayServiceDataModel())
     val playServiceDataModel = _playServiceDataStateFlow.asStateFlow()
 
