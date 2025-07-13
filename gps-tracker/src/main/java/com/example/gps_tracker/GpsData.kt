@@ -6,7 +6,7 @@ package com.example.gps_tracker
  * @param totalDistanceMeter : meter
  * @param totalTimeMills : millisecond
  */
-data class GpsDataModel(
+data class GpsData(
     val currentVelocity: Float = 0f,
     val averageVelocity: Float = 0f,
     val totalDistanceMeter: Float = 0f,

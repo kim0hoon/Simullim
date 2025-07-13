@@ -13,6 +13,7 @@ import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.LocationSettingsResponse
 import com.google.android.gms.location.Priority
 import com.google.android.gms.location.SettingsClient
+import com.simullim.DATA_EMIT_DELAY_MILLS
 import com.simullim.millsToSec
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,9 +22,10 @@ import timber.log.Timber
 
 class GpsTracker(private val context: Context) {
     private val fusedLocationClient get() = LocationServices.getFusedLocationProviderClient(context)
-    private val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
-        .setMinUpdateIntervalMillis(1000)
-        .build()
+    private val locationRequest =
+        LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, DATA_EMIT_DELAY_MILLS)
+            .setMinUpdateIntervalMillis(DATA_EMIT_DELAY_MILLS)
+            .build()
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             locationResult.lastLocation?.let {
@@ -42,7 +44,7 @@ class GpsTracker(private val context: Context) {
         }
     }
 
-    private val _gpsDataStateFlow = MutableStateFlow(GpsDataModel())
+    private val _gpsDataStateFlow = MutableStateFlow(GpsData())
     val gpsDataStateFlow = _gpsDataStateFlow.asStateFlow()
 
     var lastLocation: Location? = null
@@ -53,6 +55,7 @@ class GpsTracker(private val context: Context) {
 
     @RequiresPermission(ACCESS_FINE_LOCATION)
     fun start() {
+        if (statusStateFlow.value is Status.Tracking) return
         checkLocationSetting(onSuccess = {
             startTracking()
         }, onFailure = ::onFailureCheckLocationSetting)
@@ -101,9 +104,16 @@ class GpsTracker(private val context: Context) {
     }
 
     fun stop() {
-        _gpsDataStateFlow.value = GpsDataModel()
+        _gpsDataStateFlow.value = GpsData()
         fusedLocationClient.removeLocationUpdates(locationCallback)
         _statusStateFlow.value = Status.Paused
+    }
+
+    fun release() {
+        fusedLocationClient.run {
+            removeLocationUpdates(locationCallback)
+            removeLocationUpdates(oneShotLocationCallback)
+        }
     }
 
     @RequiresPermission(ACCESS_FINE_LOCATION)
@@ -126,7 +136,7 @@ class GpsTracker(private val context: Context) {
                 it.totalTimeMills + (lastLocation?.let { lastLocation -> location.time - lastLocation.time }
                     ?: 0)
             val averageVelocity = totalDistance / millsToSec(totalTime)
-            GpsDataModel(
+            GpsData(
                 currentVelocity = currentSpeed,
                 averageVelocity = averageVelocity,
                 totalDistanceMeter = totalDistance,

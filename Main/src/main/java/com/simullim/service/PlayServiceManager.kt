@@ -5,19 +5,20 @@ import android.content.Intent
 import androidx.core.content.ContextCompat.startForegroundService
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import com.example.gps_tracker.GpsDataModel
-import com.simullim.collectOnLifecycle
+import com.example.gps_tracker.GpsData
+import com.simullim.service.model.PlayServiceInputModel
 
 //TODO 상태관리 stateflow 추가
 /**
  * PlayService를 관리하는 함수
  */
 internal class PlayServiceManager(
-    private val lifecycleOwner: LifecycleOwner,
+    lifecycleOwner: LifecycleOwner,
     private val context: Context,
-    private val onGpsDataEmitted: (GpsDataModel) -> Unit,
+    private val onGpsDataEmitted: (GpsData) -> Unit,
 ) : DefaultLifecycleObserver {
-    private val playServiceConnection = PlayServiceConnection(onConnected = { isBound = true },
+    private val playServiceConnection = PlayServiceConnection(
+        onConnected = { isBound = true },
         onDisConnected = { isBound = false })
     private val service get() = playServiceConnection.service.takeIf { isBound }
     private val intent by lazy {
@@ -33,11 +34,10 @@ internal class PlayServiceManager(
         startForegroundService(context, intent)
         bindService()
         service?.run {
-            gpsDataStateFlow.collectOnLifecycle(lifecycleOwner) {
-                onGpsDataEmitted(it)
-            }
+//            gpsDataStateFlow?.collectOnLifecycle(lifecycleOwner) {
+//                onGpsDataEmitted(it)
+//            }
         }
-        play()
     }
 
     fun stopService() {
@@ -45,8 +45,8 @@ internal class PlayServiceManager(
         context.stopService(intent)
     }
 
-    fun play() {
-        service?.start {
+    fun play(playServiceInputModel: PlayServiceInputModel) {
+        service?.start(playServiceInputModel = playServiceInputModel) {
             //TODO onDenied
         }
     }
@@ -57,6 +57,12 @@ internal class PlayServiceManager(
 
     fun stop() {
         service?.stop()
+    }
+
+    fun resume() {
+        service?.resume {
+            //TODO onDenied
+        }
     }
 
     override fun onStart(owner: LifecycleOwner) {
