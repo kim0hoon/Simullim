@@ -126,14 +126,27 @@ internal class PlayService : LifecycleService() {
     private fun createMusicPlayerInput(playServiceInputModel: PlayServiceInputModel): List<MusicPlayerInput> {
         val totalDurationMills = playServiceInputModel.paceSetting.totalTimeSec * 1000
         val oneCycleDurationMills = playServiceInputModel.playlistModel.totalDurationMills
-        val cycle = totalDurationMills / oneCycleDurationMills + 1
+        val cycle = totalDurationMills / oneCycleDurationMills
+        var remain = totalDurationMills % oneCycleDurationMills
+
         val fullInput = playServiceInputModel.playlistModel.playlist.map {
             MusicPlayerInput(
                 uriString = it.url,
-                clipDurationMills = it.durationMills
+                displayTitle = it.title
             )
         }
-        return List(cycle.toInt()) { fullInput }.flatten()
+        val remainInput =
+            playServiceInputModel.playlistModel.playlist.map { input ->
+                val clipDurationMills =
+                    if (remain < input.durationMills) remain else input.durationMills
+                remain = remain - clipDurationMills
+                MusicPlayerInput(
+                    uriString = input.url,
+                    clipDurationMills = clipDurationMills,
+                    displayTitle = input.title
+                )
+            }.filterNot { it.clipDurationMills == 0L }
+        return (List(cycle.toInt()) { fullInput } + listOf(remainInput)).flatten()
     }
 
     fun resume(onDenied: () -> Unit) {
